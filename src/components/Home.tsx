@@ -68,11 +68,20 @@ export default function Home({ books, bundles, settings, onBookSelect, onAddToCa
           >
             <div className="relative">
               <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full scale-110" />
-              <img 
-                src={featuredBook?.coverImage} 
-                alt="Featured" 
-                className="w-64 md:w-80 h-auto rounded-xl shadow-[0_50px_100px_rgba(0,0,0,0.4)] rotate-[6deg] hover:rotate-0 transition-all duration-700 cursor-pointer"
-                onClick={() => onBookSelect(featuredBook)}
+              <motion.img 
+                src={featuredBook?.coverImage || "https://images.unsplash.com/photo-1544640808-32ca72ac7f37?auto=format&fit=crop&q=80&w=1000"} 
+                alt={featuredBook?.title || "Library"} 
+                className="w-64 md:w-80 h-auto rounded-xl shadow-[0_50px_100px_rgba(0,0,0,0.4)] cursor-pointer"
+                animate={{ 
+                  y: [0, -15, 0],
+                  rotate: [6, 4, 6]
+                }}
+                transition={{ 
+                  duration: 6, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+                onClick={() => featuredBook && onBookSelect(featuredBook)}
               />
             </div>
           </motion.div>
@@ -266,7 +275,7 @@ export default function Home({ books, bundles, settings, onBookSelect, onAddToCa
               خدمة توفير الكتب الخاصة من ميراد توفر لك فرصة اقتناء أندر النسخ من جميع أنحاء العالم. أخبرنا عما تبحث عنه وسنتولى المهمة.
             </p>
             <button 
-              onClick={() => window.open('https://wa.me/201116135630', '_blank')}
+              onClick={() => window.open(`https://wa.me/${settings.whatsappNumber}`, '_blank')}
               className="bg-white text-secondary px-10 py-5 rounded-2xl font-bold hover:scale-105 transition-transform flex items-center gap-3 ml-auto"
             >
               تواصل مع المنسق
