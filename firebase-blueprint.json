@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "Book": {
+      "title": "Book",
+      "description": "A book available in the library",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "author": { "type": "string" },
+        "category": { "type": "string" },
+        "price": { "type": "number" },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "rating": { "type": "number" },
+        "reviews": { "type": "number" },
+        "isNew": { "type": "boolean" },
+        "description": { "type": "string" },
+        "pages": { "type": "number" },
+        "language": { "type": "string" }
+      },
+      "required": ["id", "title", "author", "price", "images"]
+    },
+    "Bundle": {
+      "title": "Bundle",
+      "description": "A collection of books sold as a pack",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "price": { "type": "number" },
+        "booksCount": { "type": "number" },
+        "items": { "type": "array", "items": { "type": "string" } },
+        "image": { "type": "string" },
+        "category": { "type": "string" }
+      },
+      "required": ["id", "title", "price", "booksCount", "items", "image"]
+    },
+    "ShippingRate": {
+      "title": "ShippingRate",
+      "description": "Shipping cost for a specific governorate",
+      "type": "object",
+      "properties": {
+        "governorate": { "type": "string" },
+        "price": { "type": "number" }
+      },
+      "required": ["governorate", "price"]
+    },
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Global configuration for the website",
+      "type": "object",
+      "properties": {
+        "heroTag": { "type": "string" },
+        "heroTitle1": { "type": "string" },
+        "heroTitle2": { "type": "string" },
+        "heroSubtitle": { "type": "string" },
+        "footerDescription": { "type": "string" },
+        "whatsappNumber": { "type": "string" },
+        "whatsappChannel": { "type": "string" },
+        "instagramUrl": { "type": "string" },
+        "facebookUrl": { "type": "string" },
+        "tiktokUrl": { "type": "string" },
+        "footerCopyright": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/books/{bookId}": {
+      "schema": "Book",
+      "description": "Collection of books"
+    },
+    "/bundles/{bundleId}": {
+      "schema": "Bundle",
+      "description": "Collection of book bundles"
+    },
+    "/shipping_rates/{rateId}": {
+      "schema": "ShippingRate",
+      "description": "Shipping rates by governorate"
+    },
+    "/settings/main": {
+      "schema": "SiteSettings",
+      "description": "Singleton document for site-wide settings"
+    }
+  }
+}

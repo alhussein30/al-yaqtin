@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import { ShoppingCart, X, Plus, Minus, MessageCircle, Truck, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CartItem, ShippingRate } from '../types';
+import { CartItem, ShippingRate, SiteSettings } from '../types';
 
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   items: CartItem[];
   shippingRates: ShippingRate[];
+  settings: SiteSettings;
   onUpdateQuantity: (id: string, delta: number) => void;
   onRemoveItem: (id: string) => void;
 }
 
-export default function CartDrawer({ isOpen, onClose, items, shippingRates, onUpdateQuantity, onRemoveItem }: CartDrawerProps) {
+export default function CartDrawer({ isOpen, onClose, items, shippingRates, settings, onUpdateQuantity, onRemoveItem }: CartDrawerProps) {
   const [selectedGovernorate, setSelectedGovernorate] = useState<string>('');
 
   const getDiscountedPrice = (item: CartItem) => {
@@ -37,7 +38,7 @@ export default function CartDrawer({ isOpen, onClose, items, shippingRates, onUp
       `\nالشحن: ${shippingPrice.toFixed(2)} ج.م` +
       `\nالإجمالي النهائي: ${total.toFixed(2)} ج.م`;
     
-    window.open(`https://wa.me/201116135630?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (

@@ -52,5 +52,9 @@ export interface SiteSettings {
   heroSubtitle: string;
   footerDescription: string;
   whatsappNumber: string;
+  whatsappChannel: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  tiktokUrl: string;
   footerCopyright: string;
 }

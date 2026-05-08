@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // For this app, any signed-in user is considered an admin for now
+    // In a real app, we'd check a specific UID or custom claim
+    function isAdmin() {
+      return isSignedIn();
+    }
+
+    // Public Collections
+    match /books/{bookId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /bundles/{bundleId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /shipping_rates/{rateId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Test connection path
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}

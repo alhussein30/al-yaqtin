@@ -342,6 +342,55 @@ export default function AdminDashboard({
                 </div>
               </div>
 
+              {/* Social Media Settings */}
+              <div className="space-y-6 bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100">
+                <h3 className="text-lg font-bold text-zinc-900 mb-4 border-b border-zinc-200 pb-2">روابط التواصل الاجتماعي</h3>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">قناة الواتساب</label>
+                  <input 
+                    type="text"
+                    value={settings.whatsappChannel}
+                    onChange={(e) => onUpdateSettings({ ...settings, whatsappChannel: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-left"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">رابط فيسبوك</label>
+                  <input 
+                    type="text"
+                    value={settings.facebookUrl}
+                    onChange={(e) => onUpdateSettings({ ...settings, facebookUrl: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-left"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">رابط انستجرام</label>
+                  <input 
+                    type="text"
+                    value={settings.instagramUrl}
+                    onChange={(e) => onUpdateSettings({ ...settings, instagramUrl: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-left"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">رابط تيك توك</label>
+                  <input 
+                    type="text"
+                    value={settings.tiktokUrl}
+                    onChange={(e) => onUpdateSettings({ ...settings, tiktokUrl: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-left"
+                    dir="ltr"
+                  />
+                </div>
+              </div>
+
               <div className="flex items-center gap-2 text-green-600 bg-green-50 p-4 rounded-xl border border-green-100 font-bold text-sm justify-center">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                 يتم حفظ التغييرات تلقائياً وبشكل فوري
