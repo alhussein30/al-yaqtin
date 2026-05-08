@@ -1,7 +1,9 @@
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 import Logo from './Logo';
+import { SiteSettings } from '../types';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
+// ... existing TikTokIcon ...
   <svg 
     viewBox="0 0 24 24" 
     fill="currentColor" 
@@ -23,7 +25,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function Footer() {
+export default function Footer({ settings }: { settings: SiteSettings }) {
   return (
     <footer className="bg-zinc-50 border-t border-zinc-200 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16">
@@ -33,10 +35,10 @@ export default function Footer() {
             <Logo size="md" />
           </div>
           <p className="text-zinc-500 text-sm leading-relaxed mb-6 max-w-2xl mx-auto">
-            تأسست في عام 2023 لتكون وجهتكم الأولى للثقافة والمعرفة. نحن نؤمن بأن كل كتاب هو بداية لرحلة معرفية جديدة ومتميزة.
+            {settings.footerDescription}
           </p>
           <div className="flex gap-4 justify-center">
-            <a href="https://wa.me/201116135630" target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-400 hover:text-green-500 hover:border-green-500 transition-all shadow-sm">
+            <a href={`https://wa.me/${settings.whatsappNumber}`} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-400 hover:text-green-500 hover:border-green-500 transition-all shadow-sm">
               <WhatsAppIcon className="w-5 h-5" />
             </a>
             <a href="#" className="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-400 hover:text-primary hover:border-primary transition-all">
@@ -56,7 +58,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 border-t border-zinc-200 flex justify-center items-center text-xs text-zinc-400">
-        <p>© 2023 مكتبة اليقطين الحديثة. جميع الحقوق محفوظة.</p>
+        <p>{settings.footerCopyright}</p>
       </div>
     </footer>
   );

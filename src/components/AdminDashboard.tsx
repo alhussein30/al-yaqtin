@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Book as BookIcon, Package, Users, TrendingUp, Filter, LogOut, Ticket, Truck } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Book as BookIcon, Package, Users, TrendingUp, Filter, LogOut, Ticket, Truck, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Book, Bundle, ShippingRate } from '../types';
+import { Book, Bundle, ShippingRate, SiteSettings } from '../types';
 import Logo from './Logo';
 
 interface AdminDashboardProps {
   books: Book[];
   bundles: Bundle[];
   shippingRates: ShippingRate[];
+  settings: SiteSettings;
   onUpdateShippingRates: (rates: ShippingRate[]) => void;
+  onUpdateSettings: (settings: SiteSettings) => void;
   onAddBook: () => void;
   onEditBook: (book: Book) => void;
   onDeleteBook: (id: string) => void;
@@ -21,7 +23,9 @@ export default function AdminDashboard({
   books, 
   bundles, 
   shippingRates,
+  settings,
   onUpdateShippingRates,
+  onUpdateSettings,
   onAddBook, 
   onEditBook, 
   onDeleteBook, 
@@ -32,7 +36,7 @@ export default function AdminDashboard({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'books' | 'bundles' | 'shipping'>('books');
+  const [activeTab, setActiveTab] = useState<'books' | 'bundles' | 'shipping' | 'settings'>('books');
 
   const categories = ['All', ...new Set(books.map(b => b.category))];
 
@@ -126,6 +130,16 @@ export default function AdminDashboard({
         >
           أسعار الشحن ({shippingRates.length})
         </button>
+        <button 
+          onClick={() => setActiveTab('settings')}
+          className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+            activeTab === 'settings' 
+              ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+              : 'bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-100'
+          }`}
+        >
+          إعدادات الموقع
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -172,7 +186,7 @@ export default function AdminDashboard({
 
       {/* Main Table Container */}
       <div className="bg-white rounded-[2rem] border border-zinc-100 shadow-sm overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
-        {activeTab !== 'shipping' && (
+        {activeTab !== 'shipping' && activeTab !== 'settings' && (
           <div className="p-8 border-b border-zinc-50 flex flex-col sm:flex-row-reverse items-center justify-between gap-4">
             <div className="relative w-full sm:w-72">
               <input 
@@ -236,6 +250,102 @@ export default function AdminDashboard({
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        ) : activeTab === 'settings' ? (
+          <div className="p-8 text-right">
+            <div className="flex items-center gap-3 mb-8 flex-row-reverse">
+              <Settings className="text-primary w-6 h-6" />
+              <h2 className="text-xl font-bold text-zinc-900">إعدادات محتوى الموقع</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-8 max-w-3xl ml-auto">
+              {/* Hero Section Settings */}
+              <div className="space-y-6 bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100">
+                <h3 className="text-lg font-bold text-zinc-900 mb-4 border-b border-zinc-200 pb-2">قسم الترحيب (Hero)</h3>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">نص الشارة العلوي</label>
+                  <input 
+                    type="text"
+                    value={settings.heroTag}
+                    onChange={(e) => onUpdateSettings({ ...settings, heroTag: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-right"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-zinc-500 block">العنوان الرئيسي 1</label>
+                    <input 
+                      type="text"
+                      value={settings.heroTitle1}
+                      onChange={(e) => onUpdateSettings({ ...settings, heroTitle1: e.target.value })}
+                      className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-right"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-zinc-500 block">العنوان الملون</label>
+                    <input 
+                      type="text"
+                      value={settings.heroTitle2}
+                      onChange={(e) => onUpdateSettings({ ...settings, heroTitle2: e.target.value })}
+                      className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-right text-primary"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">الوصف الثانوي</label>
+                  <textarea 
+                    rows={3}
+                    value={settings.heroSubtitle}
+                    onChange={(e) => onUpdateSettings({ ...settings, heroSubtitle: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-right resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Footer Section Settings */}
+              <div className="space-y-6 bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100">
+                <h3 className="text-lg font-bold text-zinc-900 mb-4 border-b border-zinc-200 pb-2">تذييل الصفحة (Footer)</h3>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">وصف المكتبة</label>
+                  <textarea 
+                    rows={3}
+                    value={settings.footerDescription}
+                    onChange={(e) => onUpdateSettings({ ...settings, footerDescription: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-right resize-none"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">رقم واتساب (بدون +)</label>
+                  <input 
+                    type="text"
+                    value={settings.whatsappNumber}
+                    onChange={(e) => onUpdateSettings({ ...settings, whatsappNumber: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-left font-mono"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">نص حقوق الملكية</label>
+                  <input 
+                    type="text"
+                    value={settings.footerCopyright}
+                    onChange={(e) => onUpdateSettings({ ...settings, footerCopyright: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-right"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-green-600 bg-green-50 p-4 rounded-xl border border-green-100 font-bold text-sm justify-center">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                يتم حفظ التغييرات تلقائياً وبشكل فوري
+              </div>
             </div>
           </div>
         ) : (

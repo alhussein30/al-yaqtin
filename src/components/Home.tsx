@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Book, Bundle } from '../types';
+import { Book, Bundle, SiteSettings } from '../types';
 import BookCard from './BookCard';
 import { MouseEvent } from 'react';
 import { Ticket, ShoppingCart } from 'lucide-react';
@@ -8,11 +8,12 @@ import { Ticket, ShoppingCart } from 'lucide-react';
 interface HomeProps {
   books: Book[];
   bundles: Bundle[];
+  settings: SiteSettings;
   onBookSelect: (book: Book) => void;
   onAddToCart: (item: Book | Bundle, e: MouseEvent) => void;
 }
 
-export default function Home({ books, bundles, onBookSelect, onAddToCart }: HomeProps) {
+export default function Home({ books, bundles, settings, onBookSelect, onAddToCart }: HomeProps) {
   const [activeCategory, setActiveCategory] = useState('الكل');
   const categories = ['الكل', ...new Set(books.map(b => b.category))];
 
@@ -38,14 +39,14 @@ export default function Home({ books, bundles, onBookSelect, onAddToCart }: Home
             className="md:w-1/2 text-white text-right order-2 md:order-1"
           >
             <div className="inline-block px-4 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-bold mb-6 border border-white/20">
-               إصدار متميز لعام 2023
+               {settings.heroTag}
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              <span className="text-white">يمكنك أن تبحر بلا بحر</span> <br />
-              <span className="text-gold">فقط ان أمسكت كتابا</span>
+              <span className="text-white">{settings.heroTitle1}</span> <br />
+              <span className="text-gold">{settings.heroTitle2}</span>
             </h1>
             <p className="text-lg text-white/70 mb-10 max-w-lg ml-auto leading-relaxed">
-              انضم إلى آلاف القراء في رحلة عبر أرقى الكتب العربية والعالمية المختارة بعناية لتناسب ذائقتك الثقافية.
+              {settings.heroSubtitle}
             </p>
             <div className="flex items-center gap-6 justify-end">
                <button 

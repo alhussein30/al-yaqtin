@@ -44,3 +44,13 @@ export interface ShippingRate {
   governorate: string;
   price: number;
 }
+
+export interface SiteSettings {
+  heroTag: string;
+  heroTitle1: string;
+  heroTitle2: string;
+  heroSubtitle: string;
+  footerDescription: string;
+  whatsappNumber: string;
+  footerCopyright: string;
+}

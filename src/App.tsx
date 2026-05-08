@@ -16,7 +16,7 @@ import BookDetails from './components/BookDetails';
 import AdminDashboard from './components/AdminDashboard';
 import CartDrawer from './components/CartDrawer';
 import AdminBookForm from './components/AdminBookForm';
-import { Book, Bundle, CartItem, View, ShippingRate } from './types';
+import { Book, Bundle, CartItem, View, ShippingRate, SiteSettings } from './types';
 import { SAMPLE_BOOKS, EGYPT_GOVERNORATES } from './constants';
 import AdminBundleForm from './components/AdminBundleForm';
 import { motion, AnimatePresence } from 'motion/react';
@@ -56,6 +56,21 @@ export default function App() {
     return EGYPT_GOVERNORATES.map(gov => ({ governorate: gov, price: 50 })); // Default 50 EGP
   });
 
+  // Site Settings State
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(() => {
+    const saved = localStorage.getItem('site_settings');
+    if (saved) return JSON.parse(saved);
+    return {
+      heroTag: 'إصدار متميز لعام 2023',
+      heroTitle1: 'يمكنك أن تبحر بلا بحر',
+      heroTitle2: 'وأن تسافر وأنت جالس',
+      heroSubtitle: 'اكتشف عالم القراءة مع مكتبة اليقطين، حيث تجد أرقى الكتب وأحدث الإصدارات في مكان واحد.',
+      footerDescription: 'تأسست في عام 2023 لتكون وجهتكم الأولى للثقافة والمعرفة. نحن نؤمن بأن كل كتاب هو بداية لرحلة معرفية جديدة ومتميزة.',
+      whatsappNumber: '201116135630',
+      footerCopyright: '© 2023 مكتبة اليقطين الحديثة. جميع الحقوق محفوظة.'
+    };
+  });
+
   // Persist books to localStorage
   useEffect(() => {
     localStorage.setItem('library_books', JSON.stringify(books));
@@ -70,6 +85,11 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('shipping_rates', JSON.stringify(shippingRates));
   }, [shippingRates]);
+
+  // Persist site settings to localStorage
+  useEffect(() => {
+    localStorage.setItem('site_settings', JSON.stringify(siteSettings));
+  }, [siteSettings]);
 
   // Admin Form State
   const [isAdminFormOpen, setIsAdminFormOpen] = useState(false);
@@ -227,6 +247,7 @@ export default function App() {
               <Home 
                 books={books} 
                 bundles={bundles}
+                settings={siteSettings}
                 onBookSelect={handleBookClick} 
                 onAddToCart={handleAddToCart} 
               />
@@ -318,7 +339,9 @@ export default function App() {
                   books={books} 
                   bundles={bundles}
                   shippingRates={shippingRates}
+                  settings={siteSettings}
                   onUpdateShippingRates={setShippingRates}
+                  onUpdateSettings={setSiteSettings}
                   onAddBook={handleAddBook}
                   onEditBook={handleEditBook}
                   onDeleteBook={handleDeleteBook}
@@ -332,7 +355,7 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {currentView !== 'admin' && <Footer />}
+      {currentView !== 'admin' && <Footer settings={siteSettings} />}
 
       <CartDrawer 
         isOpen={isCartOpen} 
