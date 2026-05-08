@@ -1,5 +1,6 @@
-import { Search, ShoppingCart, User, Menu } from 'lucide-react';
-import { motion } from 'motion/react';
+import { useState } from 'react';
+import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import Logo from './Logo';
 
 interface NavbarProps {
@@ -12,6 +13,15 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeClick, onBooksClick, currentView }: NavbarProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  const handleMobileNav = (callback: () => void) => {
+    callback();
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <nav className="bg-white border-b border-zinc-100 sticky top-0 w-full z-40 transition-all duration-300">
       <div className="flex flex-row items-center justify-between w-full px-6 md:px-12 max-w-7xl mx-auto h-24">
@@ -29,7 +39,7 @@ export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeCli
           </div>
         </div>
 
-        {/* Navigation Links */}
+        {/* Navigation Links (Desktop) */}
         <div className="hidden md:flex items-center gap-10">
           <button 
             onClick={onHomeClick}
@@ -79,12 +89,57 @@ export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeCli
               )}
             </button>
             <Logo size="sm" className="md:hidden" />
-            <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center cursor-pointer hover:bg-zinc-200 transition-colors md:hidden">
-                <Menu className="w-5 h-5 text-zinc-600" />
+            <div 
+              onClick={toggleMobileMenu}
+              className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center cursor-pointer hover:bg-zinc-200 transition-colors md:hidden"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5 text-zinc-600" /> : <Menu className="w-5 h-5 text-zinc-600" />}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-t border-zinc-100 overflow-hidden"
+          >
+            <div className="flex flex-col p-6 gap-4">
+              <button 
+                onClick={() => handleMobileNav(onHomeClick)}
+                className={`text-right py-3 px-4 rounded-xl font-bold transition-all ${currentView === 'home' ? 'bg-primary/5 text-primary' : 'text-zinc-600 hover:bg-zinc-50'}`}
+              >
+                الرئيسية
+              </button>
+              <button 
+                onClick={() => handleMobileNav(onBooksClick)}
+                className="text-right py-3 px-4 rounded-xl font-bold text-zinc-600 hover:bg-zinc-50"
+              >
+                الكتب
+              </button>
+              <button 
+                onClick={() => handleMobileNav(onAdminClick)}
+                className={`text-right py-3 px-4 rounded-xl font-bold transition-all ${currentView === 'admin' ? 'bg-primary/5 text-primary' : 'text-zinc-600 hover:bg-zinc-50'}`}
+              >
+                لوحة الإدارة
+              </button>
+              
+              <div className="relative mt-2">
+                <input 
+                  type="text" 
+                  placeholder="البحث عن كتاب..." 
+                  className="w-full bg-zinc-100 border-none rounded-2xl py-4 pr-12 pl-6 text-sm outline-none focus:ring-2 focus:ring-primary/10 transition-all font-medium"
+                />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

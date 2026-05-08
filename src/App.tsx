@@ -191,11 +191,11 @@ export default function App() {
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     };
 
-    const enteredUsername = loginForm.username.trim();
+    const enteredUsername = loginForm.username.trim().toUpperCase();
     const enteredPassword = loginForm.password.trim();
     const enteredPasswordHash = await sha256(enteredPassword);
 
-    if (enteredUsername === TARGET_USERNAME && enteredPasswordHash === TARGET_PASSWORD_HASH) {
+    if (enteredUsername === 'HUSSEIN' && enteredPasswordHash === TARGET_PASSWORD_HASH) {
       setIsLoggedIn(true);
       setLoginError('');
     } else {
