@@ -62,6 +62,21 @@
         "tiktokUrl": { "type": "string" },
         "footerCopyright": { "type": "string" }
       }
+    },
+    "Accessory": {
+      "title": "Accessory",
+      "description": "A book-related accessory",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "price": { "type": "number" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "category": { "type": "string" },
+        "stock": { "type": "number" }
+      },
+      "required": ["id", "title", "price", "image"]
     }
   },
   "firestore": {
@@ -72,6 +87,10 @@
     "/bundles/{bundleId}": {
       "schema": "Bundle",
       "description": "Collection of book bundles"
+    },
+    "/accessories/{accessoryId}": {
+      "schema": "Accessory",
+      "description": "Collection of accessories"
     },
     "/shipping_rates/{rateId}": {
       "schema": "ShippingRate",

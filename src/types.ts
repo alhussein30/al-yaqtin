@@ -30,12 +30,27 @@ export interface Bundle {
   isBundle: true;
 }
 
-export interface CartItem extends Partial<Book>, Partial<Bundle> {
+export interface CartItem extends Partial<Book>, Partial<Bundle>, Partial<Accessory> {
   id: string;
   title: string;
   price: number;
   quantity: number;
-  coverImage: string;
+  coverImage: string; // We'll keep this as the main display image in cart
+}
+
+export interface Accessory {
+  id: string;
+  title: string;
+  price: number;
+  oldPrice?: number;
+  description: string;
+  image: string;
+  category?: string;
+  isNew?: boolean;
+  stock?: number;
+  rating?: number;
+  reviewsCount?: number;
+  discountPercentage?: number;
 }
 
 export type View = 'home' | 'details' | 'admin';

@@ -14,7 +14,14 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ isOpen, onClose, items, shippingRates, settings, onUpdateQuantity, onRemoveItem }: CartDrawerProps) {
-  const [selectedGovernorate, setSelectedGovernorate] = useState<string>('');
+  const [selectedGovernorate, setSelectedGovernorate] = useState<string>(() => {
+    return localStorage.getItem('yaqten_last_governorate') || '';
+  });
+
+  const handleGovernorateChange = (gov: string) => {
+    setSelectedGovernorate(gov);
+    localStorage.setItem('yaqten_last_governorate', gov);
+  };
 
   const getDiscountedPrice = (item: CartItem) => {
     return item.discountPercentage 
@@ -143,7 +150,7 @@ export default function CartDrawer({ isOpen, onClose, items, shippingRates, sett
                     </label>
                     <select 
                       value={selectedGovernorate}
-                      onChange={(e) => setSelectedGovernorate(e.target.value)}
+                      onChange={(e) => handleGovernorateChange(e.target.value)}
                       className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all text-right"
                     >
                       <option value="">-- اختر محافظة --</option>

@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Book, Bundle, SiteSettings } from '../types';
+import { Book, Bundle, SiteSettings, Accessory } from '../types';
 import BookCard from './BookCard';
 import { MouseEvent } from 'react';
-import { Ticket, ShoppingCart } from 'lucide-react';
+import { Ticket, ShoppingCart, Package } from 'lucide-react';
 
 interface HomeProps {
   books: Book[];
   bundles: Bundle[];
+  accessories: Accessory[];
   settings: SiteSettings;
   onBookSelect: (book: Book) => void;
-  onAddToCart: (item: Book | Bundle, e: MouseEvent) => void;
+  onAddToCart: (item: Book | Bundle | Accessory, e: MouseEvent) => void;
 }
 
-export default function Home({ books, bundles, settings, onBookSelect, onAddToCart }: HomeProps) {
+export default function Home({ books, bundles, accessories, settings, onBookSelect, onAddToCart }: HomeProps) {
   const [activeCategory, setActiveCategory] = useState('الكل');
   const categories = ['الكل', ...new Set(books.map(b => b.category))];
 
@@ -165,6 +166,65 @@ export default function Home({ books, bundles, settings, onBookSelect, onAddToCa
                       <div className="text-xs text-zinc-400 line-through font-bold">{bundle.oldPrice.toFixed(2)} ج.م</div>
                     )}
                   </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Accessories Section */}
+      {accessories && accessories.length > 0 && (
+        <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 bg-zinc-50/50">
+          <div className="flex flex-col md:flex-row-reverse items-center justify-between gap-6 mb-12">
+            <div className="text-right">
+              <div className="inline-flex items-center gap-2 px-4 py-1 bg-zinc-100 text-zinc-500 rounded-full text-xs font-bold mb-4 flex-row-reverse">
+                <Package className="w-3 h-3" />
+                تحف وهدايا
+              </div>
+              <h2 className="text-4xl font-bold mb-3">إكسسوارات القراءة</h2>
+              <p className="text-zinc-500">مجموعة من الإكسسوارات المميزة لكل محبي القراءة.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {accessories.map((accessory, idx) => (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.05 }}
+                key={accessory.id}
+                className="bg-white rounded-[2.5rem] p-6 border border-zinc-100 shadow-xl shadow-primary/5 group"
+              >
+                <div className="relative aspect-square mb-6 overflow-hidden rounded-3xl bg-zinc-50">
+                  <img 
+                    src={accessory.image} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                    alt={accessory.title} 
+                  />
+                  {accessory.isNew && (
+                    <div className="absolute top-4 right-4 bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg z-10">
+                      NEW
+                    </div>
+                  )}
+                </div>
+                
+                <h3 className="text-xl font-bold mb-2 line-clamp-1 text-right">{accessory.title}</h3>
+                <p className="text-zinc-400 text-xs mb-6 line-clamp-2 text-right">{accessory.description}</p>
+                
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <div className="text-right">
+                    <div className="text-lg font-black text-primary">
+                      {accessory.price.toFixed(2)} ج.م
+                    </div>
+                  </div>
+                  <button 
+                    onClick={(e) => onAddToCart(accessory, e)}
+                    className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-110 transition-all"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                  </button>
                 </div>
               </motion.div>
             ))}

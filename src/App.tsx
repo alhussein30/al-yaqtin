@@ -16,7 +16,8 @@ import BookDetails from './components/BookDetails';
 import AdminDashboard from './components/AdminDashboard';
 import CartDrawer from './components/CartDrawer';
 import AdminBookForm from './components/AdminBookForm';
-import { Book, Bundle, CartItem, View, ShippingRate, SiteSettings } from './types';
+import AdminAccessoryForm from './components/AdminAccessoryForm';
+import { Book, Bundle, CartItem, View, ShippingRate, SiteSettings, Accessory } from './types';
 import { SAMPLE_BOOKS, EGYPT_GOVERNORATES } from './constants';
 import AdminBundleForm from './components/AdminBundleForm';
 import { motion, AnimatePresence } from 'motion/react';
@@ -45,78 +46,137 @@ export default function App() {
 
   // Cart State
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    const saved = localStorage.getItem('yaqten_cart');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Persist Cart
+  useEffect(() => {
+    localStorage.setItem('yaqten_cart', JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  // Persist Login
+  useEffect(() => {
+    const saved = localStorage.getItem('yaqten_is_logged_in');
+    if (saved === 'true') {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('yaqten_is_logged_in', isLoggedIn ? 'true' : 'false');
+  }, [isLoggedIn]);
 
   // Library State
-  const [books, setBooks] = useState<Book[]>([]);
-  const [bundles, setBundles] = useState<Bundle[]>([]);
-  const [shippingRates, setShippingRates] = useState<ShippingRate[]>([]);
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>({
-    heroTag: 'إصدار متميز لعام 2023',
-    heroTitle1: 'يمكنك أن تبحر بلا بحر',
-    heroTitle2: 'فقط ان أمسكت كتابا',
-    heroSubtitle: 'اكتشف عالم القراءة مع مكتبة اليقطين، حيث تجد أرقى الكتب وأحدث الإصدارات في مكان واحد.',
-    footerDescription: 'تأسست في عام 2023 لتكون وجهتكم الأولى للثقافة والمعرفة. نحن نؤمن بأن كل كتاب هو بداية لرحلة معرفية جديدة ومتميزة.',
-    whatsappNumber: '201116135630',
-    whatsappChannel: 'https://whatsapp.com/channel/0029VbCWI9CKGGG8hZIMIu3W',
-    instagramUrl: 'https://www.instagram.com/el_yaqten1?igsh=MXc0Mm5tdXZrcXMyeg==',
-    facebookUrl: 'https://www.facebook.com/share/1BfYdHJasd/',
-    tiktokUrl: 'https://www.tiktok.com/@el_yaqten1',
-    footerCopyright: '© 2023 مكتبة اليقطين الحديثة. جميع الحقوق محفوظة.'
+  const [books, setBooks] = useState<Book[]>(() => {
+    const saved = localStorage.getItem('yaqten_books_cache');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [bundles, setBundles] = useState<Bundle[]>(() => {
+    const saved = localStorage.getItem('yaqten_bundles_cache');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [accessories, setAccessories] = useState<Accessory[]>(() => {
+    const saved = localStorage.getItem('yaqten_accessories_cache');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [shippingRates, setShippingRates] = useState<ShippingRate[]>(() => {
+    const saved = localStorage.getItem('yaqten_shipping_cache');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(() => {
+    const saved = localStorage.getItem('yaqten_settings_cache');
+    return saved ? JSON.parse(saved) : {
+      heroTag: 'إصدار متميز لعام 2023',
+      heroTitle1: 'يمكنك أن تبحر بلا بحر',
+      heroTitle2: 'فقط ان أمسكت كتابا',
+      heroSubtitle: 'اكتشف عالم القراءة مع مكتبة اليقطين، حيث تجد أرقى الكتب وأحدث الإصدارات في مكان واحد.',
+      footerDescription: 'تأسست في عام 2023 لتكون وجهتكم الأولى للثقافة والمعرفة. نحن نؤمن بأن كل كتاب هو بداية لرحلة معرفية جديدة ومتميزة.',
+      whatsappNumber: '201116135630',
+      whatsappChannel: 'https://whatsapp.com/channel/0029VbCWI9CKGGG8hZIMIu3W',
+      instagramUrl: 'https://www.instagram.com/el_yaqten1?igsh=MXc0Mm5tdXZrcXMyeg==',
+      facebookUrl: 'https://www.facebook.com/share/1BfYdHJasd/',
+      tiktokUrl: 'https://www.tiktok.com/@el_yaqten1',
+      footerCopyright: '© 2023 مكتبة اليقطين الحديثة. جميع الحقوق محفوظة.'
+    };
   });
 
   // Firestore Sync
   useEffect(() => {
     const unsubBooks = onSnapshot(collection(db, 'books'), (snapshot) => {
       if (snapshot.empty) {
-        // Initialize with sample data if empty - only if authenticated or if rules allow
-        SAMPLE_BOOKS.forEach(async (book) => {
-          try {
-            await setDoc(doc(db, 'books', book.id), book);
-          } catch (error) {
-            // Seeding might fail if not admin, which is fine
-            console.warn('Seeding books skipped (no permissions)');
-          }
-        });
+        // Initialize with sample data if empty - only if authenticated
+        if (isLoggedIn) {
+          SAMPLE_BOOKS.forEach(async (book) => {
+            try {
+              await setDoc(doc(db, 'books', book.id), book);
+            } catch (error) {
+              console.warn('Seeding books failed:', error);
+            }
+          });
+        }
       } else {
         const booksData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Book));
         setBooks(booksData);
+        localStorage.setItem('yaqten_books_cache', JSON.stringify(booksData));
       }
       setIsLoading(false);
     }, (error) => {
-      console.warn('Snapshot error on books:', error.message);
+      handleFirestoreError(error, OperationType.GET, 'books');
       setIsLoading(false);
     });
 
     const unsubBundles = onSnapshot(collection(db, 'bundles'), (snapshot) => {
       const bundlesData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Bundle));
       setBundles(bundlesData);
+      localStorage.setItem('yaqten_bundles_cache', JSON.stringify(bundlesData));
     }, (error) => {
-      console.warn('Snapshot error on bundles:', error.message);
+      handleFirestoreError(error, OperationType.GET, 'bundles');
+    });
+
+    const unsubAccessories = onSnapshot(collection(db, 'accessories'), (snapshot) => {
+      const accessoriesData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Accessory));
+      setAccessories(accessoriesData);
+      localStorage.setItem('yaqten_accessories_cache', JSON.stringify(accessoriesData));
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'accessories');
     });
 
     const unsubShipping = onSnapshot(collection(db, 'shipping_rates'), (snapshot) => {
       if (snapshot.empty) {
-        EGYPT_GOVERNORATES.forEach(async (gov) => {
-          try {
-            await setDoc(doc(db, 'shipping_rates', gov), { governorate: gov, price: 50 });
-          } catch (error) {
-             console.warn('Seeding shipping rates skipped');
-          }
-        });
+        if (isLoggedIn) {
+          EGYPT_GOVERNORATES.forEach(async (gov) => {
+            try {
+              await setDoc(doc(db, 'shipping_rates', gov), { governorate: gov, price: 50 });
+            } catch (error) {
+               console.warn('Seeding shipping rates failed');
+            }
+          });
+        }
       } else {
         const shippingData = snapshot.docs.map(doc => ({ ...doc.data() } as ShippingRate));
         setShippingRates(shippingData);
+        localStorage.setItem('yaqten_shipping_cache', JSON.stringify(shippingData));
       }
     }, (error) => {
-      console.warn('Snapshot error on shipping_rates:', error.message);
+      handleFirestoreError(error, OperationType.GET, 'shipping_rates');
     });
 
     const unsubSettings = onSnapshot(doc(db, 'settings', 'main'), (docSnap) => {
       if (docSnap.exists()) {
-        setSiteSettings(docSnap.data() as SiteSettings);
-      } else {
-        // Initialize default settings
+        const data = docSnap.data() as SiteSettings;
+        setSiteSettings(data);
+        localStorage.setItem('yaqten_settings_cache', JSON.stringify(data));
+      } else if (isLoggedIn) {
+        // Initialize default settings ONLY if logged in
         const defaultSettings = {
           heroTag: 'إصدار متميز لعام 2023',
           heroTitle1: 'يمكنك أن تبحر بلا بحر',
@@ -133,25 +193,30 @@ export default function App() {
         try {
           setDoc(doc(db, 'settings', 'main'), defaultSettings);
         } catch (error) {
-           console.warn('Seeding settings skipped');
+           console.warn('Seeding settings failed');
         }
       }
     }, (error) => {
-      console.warn('Snapshot error on settings:', error.message);
+      if (!error.message.includes('permission-denied')) {
+        handleFirestoreError(error, OperationType.GET, 'settings/main');
+      }
     });
 
     return () => {
       unsubBooks();
       unsubBundles();
+      unsubAccessories();
       unsubShipping();
       unsubSettings();
     };
-  }, []);
+  }, [isLoggedIn]); // Re-run when login state changes to trigger seeding if needed
 
   // Admin Form State
   const [isAdminFormOpen, setIsAdminFormOpen] = useState(false);
   const [isAdminBundleFormOpen, setIsAdminBundleFormOpen] = useState(false);
+  const [isAdminAccessoryFormOpen, setIsAdminAccessoryFormOpen] = useState(false);
   const [bookToEdit, setBookToEdit] = useState<Book | null>(null);
+  const [accessoryToEdit, setAccessoryToEdit] = useState<Accessory | null>(null);
 
   // Handlers
   const handleBookClick = useCallback((book: Book) => {
@@ -160,7 +225,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleAddToCart = useCallback((item: Book | Bundle, e?: MouseEvent) => {
+  const handleAddToCart = useCallback((item: Book | Bundle | Accessory, e?: MouseEvent) => {
     if (e) e.stopPropagation();
     setCartItems(prev => {
       const existing = prev.find(i => i.id === item.id);
@@ -169,7 +234,8 @@ export default function App() {
           i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
-      return [...prev, { ...item, quantity: 1 } as CartItem];
+      const coverImage = 'coverImage' in item ? item.coverImage : 'image' in item ? item.image : '';
+      return [...prev, { ...item, quantity: 1, coverImage } as CartItem];
     });
     setIsCartOpen(true);
   }, []);
@@ -230,6 +296,44 @@ export default function App() {
       await deleteDoc(doc(db, 'bundles', id));
     } catch (error) {
       console.error('Error deleting bundle:', error);
+    }
+  };
+
+  const handleAddAccessory = () => {
+    setAccessoryToEdit(null);
+    setIsAdminAccessoryFormOpen(true);
+  };
+
+  const handleEditAccessory = (accessory: Accessory) => {
+    setAccessoryToEdit(accessory);
+    setIsAdminAccessoryFormOpen(true);
+  };
+
+  const handleDeleteAccessory = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'accessories', id));
+    } catch (error) {
+      console.error('Error deleting accessory:', error);
+    }
+  };
+
+  const handleAdminAccessoryFormSubmit = async (accessoryData: Partial<Accessory>) => {
+    try {
+      if (accessoryToEdit) {
+        await updateDoc(doc(db, 'accessories', accessoryToEdit.id), { ...accessoryData });
+      } else {
+        const accessoryRef = doc(collection(db, 'accessories'));
+        const newAccessory: Accessory = {
+          ...accessoryData,
+          id: accessoryRef.id,
+          rating: Number((Math.random() * 2 + 3).toFixed(1)),
+          reviewsCount: Math.floor(Math.random() * 50),
+        } as Accessory;
+        await setDoc(accessoryRef, newAccessory);
+      }
+      setIsAdminAccessoryFormOpen(false);
+    } catch (error) {
+      console.error('Error saving accessory:', error);
     }
   };
 
@@ -314,8 +418,14 @@ export default function App() {
         setIsLoggedIn(true);
         setLoginError('');
       } catch (error) {
-        console.error('Auth error:', error);
-        setLoginError('حدث خطأ أثناء تسجيل الدخول');
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('Auth error:', errorMessage);
+        
+        if (errorMessage.includes('auth/configuration-not-found')) {
+          setLoginError('خطأ: خدمة تسجيل الدخول غير مفعلة. يرجى تفعيل "Anonymous Auth" من لوحة تحكم Firebase.');
+        } else {
+          setLoginError('حدث خطأ أثناء تسجيل الدخول. يرجى التحقق من الاتصال.');
+        }
       }
     } else {
       setLoginError('اسم المستخدم أو كلمة المرور غير صحيحة');
@@ -361,6 +471,7 @@ export default function App() {
                   <Home 
                     books={books} 
                     bundles={bundles}
+                    accessories={accessories}
                     settings={siteSettings}
                     onBookSelect={handleBookClick} 
                     onAddToCart={handleAddToCart} 
@@ -452,6 +563,7 @@ export default function App() {
                     <AdminDashboard 
                       books={books} 
                       bundles={bundles}
+                      accessories={accessories}
                       shippingRates={shippingRates}
                       settings={siteSettings}
                       onUpdateShippingRates={handleUpdateShippingRates}
@@ -461,6 +573,9 @@ export default function App() {
                       onDeleteBook={handleDeleteBook}
                       onAddBundle={handleAddBundle}
                       onDeleteBundle={handleDeleteBundle}
+                      onAddAccessory={handleAddAccessory}
+                      onEditAccessory={handleEditAccessory}
+                      onDeleteAccessory={handleDeleteAccessory}
                       onLogout={handleLogout}
                     />
                   )}
@@ -495,6 +610,13 @@ export default function App() {
         books={books}
         onClose={() => setIsAdminBundleFormOpen(false)}
         onSave={handleAdminBundleFormSubmit}
+      />
+
+      <AdminAccessoryForm 
+        isOpen={isAdminAccessoryFormOpen}
+        onClose={() => setIsAdminAccessoryFormOpen(false)}
+        onSave={handleAdminAccessoryFormSubmit}
+        editAccessory={accessoryToEdit}
       />
     </div>
   );

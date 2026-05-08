@@ -6,36 +6,84 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // Helpers
+    // --- Helpers ---
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // For this app, any signed-in user is considered an admin for now
-    // In a real app, we'd check a specific UID or custom claim
-    function isAdmin() {
+    function isVerified() {
+      // For anonymous auth, we don't check email_verified
       return isSignedIn();
     }
 
-    // Public Collections
+    function isAdmin() {
+      // In this app, anyone signed in is an admin for the sake of demo/simplicity
+      return isSignedIn();
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // --- Validation Helpers ---
+    function isValidBook(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.price is number && data.price >= 0;
+    }
+
+    function isValidBundle(data) {
+      return data.title is string && data.title.size() > 0 &&
+             data.price is number && data.price >= 0;
+    }
+
+    function isValidAccessory(data) {
+      return data.title is string && data.title.size() > 0 &&
+             data.price is number && data.price >= 0;
+    }
+
+    function isValidShippingRate(data) {
+      return data.governorate is string && data.price is number;
+    }
+
+    function isValidSettings(data) {
+      return data.whatsappNumber is string;
+    }
+
+    // --- Collections ---
+
     match /books/{bookId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create: if isAdmin() && isValidBook(incoming()) && isValidId(bookId);
+      allow update: if isAdmin() && isValidBook(incoming());
+      allow delete: if isAdmin();
     }
 
     match /bundles/{bundleId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create: if isAdmin() && isValidBundle(incoming()) && isValidId(bundleId);
+      allow update: if isAdmin() && isValidBundle(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /accessories/{accessoryId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidAccessory(incoming()) && isValidId(accessoryId);
+      allow update: if isAdmin() && isValidAccessory(incoming());
+      allow delete: if isAdmin();
     }
 
     match /shipping_rates/{rateId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() && isValidShippingRate(incoming());
     }
 
     match /settings/{settingId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() && isValidSettings(incoming());
     }
 
     // Test connection path

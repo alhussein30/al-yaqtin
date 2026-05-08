@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Plus, Search, Edit2, Trash2, Book as BookIcon, Package, Users, TrendingUp, Filter, LogOut, Ticket, Truck, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Book, Bundle, ShippingRate, SiteSettings } from '../types';
+import { Book, Bundle, ShippingRate, SiteSettings, Accessory } from '../types';
 import Logo from './Logo';
 
 interface AdminDashboardProps {
   books: Book[];
   bundles: Bundle[];
+  accessories: Accessory[];
   shippingRates: ShippingRate[];
   settings: SiteSettings;
   onUpdateShippingRates: (rates: ShippingRate[]) => void;
@@ -16,12 +17,16 @@ interface AdminDashboardProps {
   onDeleteBook: (id: string) => void;
   onAddBundle: () => void;
   onDeleteBundle: (id: string) => void;
+  onAddAccessory: () => void;
+  onEditAccessory: (accessory: Accessory) => void;
+  onDeleteAccessory: (id: string) => void;
   onLogout: () => void;
 }
 
 export default function AdminDashboard({ 
   books, 
   bundles, 
+  accessories,
   shippingRates,
   settings,
   onUpdateShippingRates,
@@ -31,14 +36,18 @@ export default function AdminDashboard({
   onDeleteBook, 
   onAddBundle,
   onDeleteBundle,
+  onAddAccessory,
+  onEditAccessory,
+  onDeleteAccessory,
   onLogout 
 }: AdminDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'books' | 'bundles' | 'shipping' | 'settings'>('books');
+  const [activeTab, setActiveTab] = useState<'books' | 'bundles' | 'accessories' | 'shipping' | 'settings'>('books');
 
   const categories = ['All', ...new Set(books.map(b => b.category))];
+  const accessoryCategories = ['All', ...new Set(accessories.map(a => a.category || 'أخرى'))];
 
   const filteredBooks = books.filter(book => {
     const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -51,11 +60,19 @@ export default function AdminDashboard({
     bundle.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredAccessories = accessories.filter(accessory => {
+    const matchesSearch = accessory.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === 'All' || accessory.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   const confirmDelete = (id: string) => {
     if (activeTab === 'books') {
       onDeleteBook(id);
-    } else {
+    } else if (activeTab === 'bundles') {
       onDeleteBundle(id);
+    } else if (activeTab === 'accessories') {
+      onDeleteAccessory(id);
     }
     setDeleteConfirmId(null);
   };
@@ -81,6 +98,13 @@ export default function AdminDashboard({
         </div>
         
         <div className="flex gap-4 w-full md:w-auto">
+          <button 
+            onClick={onAddAccessory}
+            className="flex-1 bg-white border-2 border-zinc-200 text-zinc-600 px-6 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-zinc-50 transition-all active:scale-95 shadow-sm"
+          >
+            <Package className="w-5 h-5" />
+            إضافة إكسسوار
+          </button>
           <button 
             onClick={onAddBundle}
             className="flex-1 bg-white border-2 border-primary text-primary px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-primary/5 transition-all active:scale-95 shadow-sm"
@@ -119,6 +143,16 @@ export default function AdminDashboard({
           }`}
         >
           العروض والحزم ({bundles.length})
+        </button>
+        <button 
+          onClick={() => { setActiveTab('accessories'); setFilterCategory('All'); }}
+          className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+            activeTab === 'accessories' 
+              ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+              : 'bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-100'
+          }`}
+        >
+          الإكسسوارات ({accessories.length})
         </button>
         <button 
           onClick={() => setActiveTab('shipping')}
@@ -191,7 +225,7 @@ export default function AdminDashboard({
             <div className="relative w-full sm:w-72">
               <input 
                 type="text" 
-                placeholder={activeTab === 'books' ? "البحث في الكتب..." : "البحث في العروض..."} 
+                placeholder={activeTab === 'books' ? "البحث في الكتب..." : activeTab === 'accessories' ? "البحث في الإكسسوارات..." : "البحث في العروض..."} 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-zinc-50 border-none rounded-xl py-3 pr-12 text-sm outline-none focus:ring-2 focus:ring-primary/10 transition-all text-right"
@@ -199,7 +233,7 @@ export default function AdminDashboard({
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
             </div>
             
-            {activeTab === 'books' && (
+            {(activeTab === 'books' || activeTab === 'accessories') && (
               <div className="flex gap-4 w-full sm:w-auto">
                 <div className="relative min-w-[150px]">
                   <select 
@@ -207,7 +241,7 @@ export default function AdminDashboard({
                     onChange={(e) => setFilterCategory(e.target.value)}
                     className="w-full appearance-none bg-zinc-50 border border-zinc-100 rounded-xl px-10 py-3 text-sm font-bold text-zinc-500 outline-none focus:ring-2 focus:ring-primary/10 transition-all text-right"
                   >
-                    {categories.map(cat => (
+                    {(activeTab === 'books' ? categories : accessoryCategories).map(cat => (
                       <option key={cat} value={cat}>{cat === 'All' ? 'جميع التصنيفات' : cat}</option>
                     ))}
                   </select>
@@ -402,9 +436,9 @@ export default function AdminDashboard({
             <table className="w-full">
               <thead>
                 <tr className="bg-zinc-50 text-zinc-400 text-xs font-bold uppercase tracking-widest text-right">
-                  <th className="px-8 py-5">{activeTab === 'books' ? 'الكتاب' : 'العرض'}</th>
-                  <th className="px-8 py-5">{activeTab === 'books' ? 'الفئة' : 'عدد الكتب'}</th>
-                  <th className="px-8 py-5">{activeTab === 'books' ? 'المخزن' : 'الحالة'}</th>
+                  <th className="px-8 py-5">{activeTab === 'books' ? 'الكتاب' : activeTab === 'accessories' ? 'الإكسسوار' : 'العرض'}</th>
+                  <th className="px-8 py-5">{activeTab === 'books' ? 'الفئة' : activeTab === 'accessories' ? 'الفئة' : 'عدد الكتب'}</th>
+                  <th className="px-8 py-5">المخزن</th>
                   <th className="px-8 py-5">السعر</th>
                   <th className="px-8 py-5 text-center">الإجراءات</th>
                 </tr>
@@ -478,6 +512,78 @@ export default function AdminDashboard({
                             ) : (
                               <button 
                                 onClick={() => setDeleteConfirmId(book.id)}
+                                className="p-2 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100 text-zinc-400 hover:text-red-500 transition-all"
+                                title="حذف"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))
+                  ) : activeTab === 'accessories' ? (
+                    filteredAccessories.map((accessory) => (
+                      <motion.tr 
+                        layout
+                        key={accessory.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="hover:bg-zinc-50/50 transition-colors group"
+                      >
+                        <td className="px-8 py-5">
+                          <div className="flex items-center gap-4 flex-row-reverse">
+                            <img src={accessory.image} className="w-12 h-12 object-cover rounded-lg shadow-sm" alt="" />
+                            <div className="text-right">
+                              <div className="font-bold text-zinc-900 group-hover:text-primary transition-colors line-clamp-1">{accessory.title}</div>
+                              <div className="text-xs text-zinc-400">{accessory.description.substring(0, 30)}...</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-8 py-5">
+                          <span className="inline-block px-3 py-1 bg-zinc-100 text-zinc-500 rounded-lg text-xs font-bold">
+                            {accessory.category || 'أخرى'}
+                          </span>
+                        </td>
+                        <td className="px-8 py-5">
+                          <span className={`font-bold ${accessory.stock && accessory.stock < 5 ? 'text-red-500' : 'text-zinc-600'}`}>
+                            {accessory.stock || 0} وحدة
+                          </span>
+                        </td>
+                        <td className="px-8 py-5">
+                          <div className="font-bold text-primary">
+                            {accessory.price.toFixed(2)} ج.م
+                          </div>
+                        </td>
+                        <td className="px-8 py-5">
+                          <div className="flex gap-2 justify-center">
+                            <button 
+                              onClick={() => onEditAccessory(accessory)}
+                              className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-zinc-100 text-zinc-400 hover:text-primary transition-all"
+                              title="تعديل"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            
+                            {deleteConfirmId === accessory.id ? (
+                              <div className="flex items-center gap-1">
+                                <button 
+                                  onClick={() => confirmDelete(accessory.id)}
+                                  className="px-3 py-1 bg-red-500 text-white text-[10px] font-bold rounded-lg hover:bg-red-600 transition-all"
+                                >
+                                  تأكيد
+                                </button>
+                                <button 
+                                  onClick={() => setDeleteConfirmId(null)}
+                                  className="px-3 py-1 bg-zinc-100 text-zinc-500 text-[10px] font-bold rounded-lg hover:bg-zinc-200 transition-all"
+                                >
+                                  إلغاء
+                                </button>
+                              </div>
+                            ) : (
+                              <button 
+                                onClick={() => setDeleteConfirmId(accessory.id)}
                                 className="p-2 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100 text-zinc-400 hover:text-red-500 transition-all"
                                 title="حذف"
                               >
@@ -566,7 +672,9 @@ export default function AdminDashboard({
                 </AnimatePresence>
               </tbody>
             </table>
-            {((activeTab === 'books' && filteredBooks.length === 0) || (activeTab === 'bundles' && filteredBundles.length === 0)) && (
+            {((activeTab === 'books' && filteredBooks.length === 0) || 
+              (activeTab === 'bundles' && filteredBundles.length === 0) || 
+              (activeTab === 'accessories' && filteredAccessories.length === 0)) && (
               <div className="p-20 text-center">
                 <div className="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-300">
                   <Search className="w-10 h-10" />
