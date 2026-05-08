@@ -11,9 +11,10 @@ interface CartDrawerProps {
   settings: SiteSettings;
   onUpdateQuantity: (id: string, delta: number) => void;
   onRemoveItem: (id: string) => void;
+  onClearCart: () => void;
 }
 
-export default function CartDrawer({ isOpen, onClose, items, shippingRates, settings, onUpdateQuantity, onRemoveItem }: CartDrawerProps) {
+export default function CartDrawer({ isOpen, onClose, items, shippingRates, settings, onUpdateQuantity, onRemoveItem, onClearCart }: CartDrawerProps) {
   const [selectedGovernorate, setSelectedGovernorate] = useState<string>(() => {
     return localStorage.getItem('yaqten_last_governorate') || '';
   });
@@ -46,6 +47,10 @@ export default function CartDrawer({ isOpen, onClose, items, shippingRates, sett
       `\nالإجمالي النهائي: ${total.toFixed(2)} ج.م`;
     
     window.open(`https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    
+    // Clear cart after redirect
+    onClearCart();
+    onClose();
   };
 
   return (

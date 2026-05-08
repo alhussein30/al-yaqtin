@@ -254,6 +254,10 @@ export default function App() {
     setCartItems(prev => prev.filter(item => item.id !== id));
   }, []);
 
+  const handleClearCart = useCallback(() => {
+    setCartItems([]);
+  }, []);
+
   const handleAddBook = () => {
     setBookToEdit(null);
     setIsAdminFormOpen(true);
@@ -596,6 +600,7 @@ export default function App() {
         settings={siteSettings}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
+        onClearCart={handleClearCart}
       />
 
       <AdminBookForm 
