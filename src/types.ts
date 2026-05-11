@@ -53,7 +53,7 @@ export interface Accessory {
   discountPercentage?: number;
 }
 
-export type View = 'home' | 'details' | 'admin';
+export type View = 'home' | 'details' | 'admin' | 'wishlist';
 
 export interface ShippingRate {
   governorate: string;
@@ -61,6 +61,7 @@ export interface ShippingRate {
 }
 
 export interface SiteSettings {
+  heroBookId?: string;
   heroTag: string;
   heroTitle1: string;
   heroTitle2: string;

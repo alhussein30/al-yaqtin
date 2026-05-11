@@ -1,18 +1,29 @@
 import { useState, useRef } from 'react';
-import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Logo from './Logo';
 
 interface NavbarProps {
   onCartClick: () => void;
+  onWishlistClick: () => void;
   cartCount: number;
+  wishlistCount: number;
   onAdminClick: () => void;
   onHomeClick: () => void;
   onBooksClick: () => void;
   currentView: string;
 }
 
-export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeClick, onBooksClick, currentView }: NavbarProps) {
+export default function Navbar({ 
+  onCartClick, 
+  onWishlistClick,
+  cartCount, 
+  wishlistCount,
+  onAdminClick, 
+  onHomeClick, 
+  onBooksClick, 
+  currentView 
+}: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -85,6 +96,21 @@ export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeCli
 
           <div className="flex items-center gap-4">
             <button 
+              onClick={onWishlistClick}
+              className="relative p-3 bg-zinc-100 hover:bg-zinc-200 rounded-2xl transition-all active:scale-95 group hidden md:flex"
+            >
+              <Heart className={`w-5 h-5 ${currentView === 'wishlist' ? 'text-primary' : 'text-zinc-600'} group-hover:text-primary transition-colors`} />
+              {wishlistCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-lg"
+                >
+                  {wishlistCount}
+                </motion.span>
+              )}
+            </button>
+            <button 
               onClick={onCartClick}
               className="relative p-3 bg-zinc-100 hover:bg-zinc-200 rounded-2xl transition-all active:scale-95 group"
             >
@@ -125,6 +151,12 @@ export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeCli
                 className={`text-right py-3 px-4 rounded-xl font-bold transition-all ${currentView === 'home' ? 'bg-primary/5 text-primary' : 'text-zinc-600 hover:bg-zinc-50'}`}
               >
                 الرئيسية
+              </button>
+              <button 
+                onClick={() => handleMobileNav(onWishlistClick)}
+                className={`text-right py-3 px-4 rounded-xl font-bold transition-all ${currentView === 'wishlist' ? 'bg-primary/5 text-primary' : 'text-zinc-600 hover:bg-zinc-50'}`}
+              >
+                قائمة الرغبات ({wishlistCount})
               </button>
               <button 
                 onClick={() => handleMobileNav(onBooksClick)}

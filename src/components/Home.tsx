@@ -24,7 +24,9 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
     ? books 
     : books.filter(b => b.category === activeCategory);
 
-  const featuredBook = books[0];
+  const featuredBook = settings.heroBookId 
+    ? books.find(b => b.id === settings.heroBookId) || books[0]
+    : books[0];
 
   return (
     <div className="pb-20">

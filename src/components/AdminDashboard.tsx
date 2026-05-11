@@ -299,6 +299,20 @@ export default function AdminDashboard({
                 <h3 className="text-lg font-bold text-zinc-900 mb-4 border-b border-zinc-200 pb-2">قسم الترحيب (Hero)</h3>
                 
                 <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 block">الكتاب المميز (يظهر بجانب النص)</label>
+                  <select 
+                    value={settings.heroBookId || ''}
+                    onChange={(e) => onUpdateSettings({ ...settings, heroBookId: e.target.value })}
+                    className="w-full bg-white border border-zinc-200 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all text-right appearance-none"
+                  >
+                    <option value="">اختر كتاباً...</option>
+                    {books.map(book => (
+                      <option key={book.id} value={book.id}>{book.title}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
                   <label className="text-sm font-bold text-zinc-500 block">نص الشارة العلوي</label>
                   <input 
                     type="text"

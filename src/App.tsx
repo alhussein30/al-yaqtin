@@ -13,6 +13,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './components/Home';
 import ProductDetails from './components/ProductDetails';
+import Wishlist from './components/Wishlist';
 import AdminDashboard from './components/AdminDashboard';
 import CartDrawer from './components/CartDrawer';
 import AdminBookForm from './components/AdminBookForm';
@@ -58,10 +59,21 @@ export default function App() {
     return [];
   });
 
+  // Wishlist State
+  const [wishlist, setWishlist] = useState<(Book | Bundle | Accessory)[]>(() => {
+    const saved = localStorage.getItem('yaqten_wishlist');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   // Persist Cart
   useEffect(() => {
     localStorage.setItem('yaqten_cart', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  // Persist Wishlist
+  useEffect(() => {
+    localStorage.setItem('yaqten_wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
 
   // Persist Login
   useEffect(() => {
@@ -95,6 +107,7 @@ export default function App() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(() => {
     const saved = localStorage.getItem('yaqten_settings_cache');
     return saved ? JSON.parse(saved) : {
+      heroBookId: '',
       heroTag: 'إصدار متميز لعام 2023',
       heroTitle1: 'يمكنك أن تبحر بلا بحر',
       heroTitle2: 'فقط ان أمسكت كتابا',
@@ -178,6 +191,7 @@ export default function App() {
       } else if (isLoggedIn) {
         // Initialize default settings ONLY if logged in
         const defaultSettings = {
+          heroBookId: '',
           heroTag: 'إصدار متميز لعام 2023',
           heroTitle1: 'يمكنك أن تبحر بلا بحر',
           heroTitle2: 'فقط ان أمسكت كتابا',
@@ -223,6 +237,16 @@ export default function App() {
     setSelectedItem(item);
     setCurrentView('details');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleToggleWishlist = useCallback((item: Book | Bundle | Accessory) => {
+    setWishlist(prev => {
+      const exists = prev.find(i => i.id === item.id);
+      if (exists) {
+        return prev.filter(i => i.id !== item.id);
+      }
+      return [...prev, item];
+    });
   }, []);
 
   const handleAddToCart = useCallback((item: Book | Bundle | Accessory, e?: MouseEvent) => {
@@ -440,7 +464,9 @@ export default function App() {
     <div className="flex flex-col min-h-screen overflow-x-hidden">
       <Navbar 
         onCartClick={() => setIsCartOpen(true)} 
+        onWishlistClick={() => setCurrentView('wishlist')}
         cartCount={cartItems.reduce((s, i) => s + i.quantity, 0)}
+        wishlistCount={wishlist.length}
         onAdminClick={() => setCurrentView('admin')}
         onHomeClick={() => setCurrentView('home')}
         onBooksClick={handleBooksScroll}
@@ -485,6 +511,24 @@ export default function App() {
                 </motion.div>
               )}
 
+              {currentView === 'wishlist' && (
+                <motion.div 
+                  key="wishlist"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Wishlist 
+                    items={wishlist}
+                    onBack={() => setCurrentView('home')}
+                    onRemove={(id) => setWishlist(prev => prev.filter(i => i.id !== id))}
+                    onSelect={handleItemSelect}
+                    onAddToCart={handleAddToCart}
+                  />
+                </motion.div>
+              )}
+
               {currentView === 'details' && selectedItem && (
                 <motion.div 
                   key="details"
@@ -496,8 +540,10 @@ export default function App() {
                   <ProductDetails 
                     product={selectedItem} 
                     allBooks={books}
+                    isInWishlist={wishlist.some(i => i.id === selectedItem.id)}
                     onBack={() => setCurrentView('home')} 
                     onAddToCart={(item) => handleAddToCart(item)}
+                    onToggleWishlist={handleToggleWishlist}
                   />
                 </motion.div>
               )}

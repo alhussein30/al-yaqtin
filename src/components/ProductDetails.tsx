@@ -1,5 +1,6 @@
-import { ArrowRight, ChevronLeft, ShoppingCart, Star, Share2, Bookmark, Mail, FileText, Globe, BookOpen, Heart, Package, Ticket } from 'lucide-react';
-import { motion } from 'motion/react';
+import { useState } from 'react';
+import { ArrowRight, ChevronLeft, ShoppingCart, Star, Share2, Bookmark, Mail, FileText, Globe, BookOpen, Heart, Package, Ticket, Check, MessageCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Book, Bundle, Accessory } from '../types';
 import Logo from './Logo';
 
@@ -8,11 +9,14 @@ type Product = Book | Bundle | Accessory;
 interface ProductDetailsProps {
   product: Product;
   allBooks?: Book[];
+  isInWishlist: boolean;
   onBack: () => void;
   onAddToCart: (product: Product) => void;
+  onToggleWishlist: (product: Product) => void;
 }
 
-export default function ProductDetails({ product, allBooks = [], onBack, onAddToCart }: ProductDetailsProps) {
+export default function ProductDetails({ product, allBooks = [], isInWishlist, onBack, onAddToCart, onToggleWishlist }: ProductDetailsProps) {
+  const [showToast, setShowToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
   const isBook = 'author' in product;
   const isBundle = 'isBundle' in product;
   const isAccessory = !isBook && !isBundle;
@@ -35,12 +39,62 @@ export default function ProductDetails({ product, allBooks = [], onBack, onAddTo
       ? (product as Accessory).category 
       : 'قوائم التوفير';
 
+  const triggerToast = (message: string, type: 'success' | 'info' = 'success') => {
+    setShowToast({ message, type });
+    setTimeout(() => setShowToast(null), 3000);
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.title,
+          text: product.description,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback to clipboard
+      navigator.clipboard.writeText(window.location.href);
+      triggerToast('تم نسخ الرابط إلى الحافظة');
+    }
+  };
+
+  const handleWishlist = () => {
+    onToggleWishlist(product);
+    triggerToast(isInWishlist ? 'تمت الإزالة من قائمة الرغبات' : 'تمت الإضافة إلى قائمة الرغبات');
+  };
+
+  const handleWhatsAppSend = () => {
+    const text = encodeURIComponent(`شاهد هذا المنتج الرائع من مكتبة اليقطين:\n\n*${product.title}*\n${product.description}\n\nالرابط: ${window.location.href}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="max-w-7xl mx-auto px-6 md:px-12 py-12"
+      className="max-w-7xl mx-auto px-6 md:px-12 py-12 relative"
     >
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, x: '-50%' }}
+            className="fixed bottom-10 left-1/2 z-50 bg-zinc-900 shadow-2xl text-white px-8 py-4 rounded-2xl flex items-center gap-4 min-w-[300px] justify-center border border-white/10 backdrop-blur-xl"
+          >
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+              <Check className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold">{showToast.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 mb-12 text-sm text-zinc-500 font-medium">
         <button onClick={onBack} className="hover:text-primary transition-colors">الرئيسية</button>
@@ -71,23 +125,32 @@ export default function ProductDetails({ product, allBooks = [], onBack, onAddTo
           </motion.div>
           
           <div className="flex justify-center gap-10 mt-10">
-            <button className="flex items-center gap-3 text-zinc-500 hover:text-primary transition-all group">
+            <button 
+              onClick={handleShare}
+              className="flex items-center gap-3 text-zinc-500 hover:text-primary transition-all group"
+            >
               <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                 <Share2 className="w-5 h-5" />
               </div>
               <span className="text-sm font-medium">مشاركة</span>
             </button>
-            <button className="flex items-center gap-3 text-zinc-500 hover:text-primary transition-all group">
-              <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                <Bookmark className="w-5 h-5" />
+            <button 
+              onClick={handleWishlist}
+              className={`flex items-center gap-3 transition-all group ${isInWishlist ? 'text-primary' : 'text-zinc-500 hover:text-primary'}`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isInWishlist ? 'bg-primary/10' : 'bg-zinc-100 group-hover:bg-primary/10'}`}>
+                <Bookmark className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
               </div>
-              <span className="text-sm font-medium">حفظ</span>
+              <span className="text-sm font-medium">{isInWishlist ? 'محفوظ' : 'حفظ'}</span>
             </button>
-            <button className="flex items-center gap-3 text-zinc-500 hover:text-primary transition-all group">
-              <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                <Mail className="w-5 h-5" />
+            <button 
+              onClick={handleWhatsAppSend}
+              className="flex items-center gap-3 text-zinc-500 hover:text-green-500 transition-all group"
+            >
+              <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-green-500/10 transition-colors">
+                <MessageCircle className="w-5 h-5" />
               </div>
-              <span className="text-sm font-medium">إرسال</span>
+              <span className="text-sm font-medium">واتساب</span>
             </button>
           </div>
         </div>
@@ -136,8 +199,11 @@ export default function ProductDetails({ product, allBooks = [], onBack, onAddTo
           </div>
 
           <div className="flex gap-4 mb-12">
-            <button className="px-6 border-2 border-zinc-100 text-primary rounded-2xl hover:bg-zinc-50 transition-all flex items-center justify-center group">
-              <Heart className="w-6 h-6 transition-transform group-hover:scale-110" />
+            <button 
+              onClick={handleWishlist}
+              className={`px-6 border-2 rounded-2xl transition-all flex items-center justify-center group ${isInWishlist ? 'border-primary bg-primary/5 text-primary' : 'border-zinc-100 text-zinc-400 hover:bg-zinc-50'}`}
+            >
+              <Heart className={`w-6 h-6 transition-transform group-hover:scale-110 ${isInWishlist ? 'fill-current' : ''}`} />
             </button>
             <button 
               disabled={isOutOfStock}
