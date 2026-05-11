@@ -11,10 +11,12 @@ interface HomeProps {
   accessories: Accessory[];
   settings: SiteSettings;
   onBookSelect: (book: Book) => void;
+  onBundleSelect: (bundle: Bundle) => void;
+  onAccessorySelect: (accessory: Accessory) => void;
   onAddToCart: (item: Book | Bundle | Accessory, e: MouseEvent) => void;
 }
 
-export default function Home({ books, bundles, accessories, settings, onBookSelect, onAddToCart }: HomeProps) {
+export default function Home({ books, bundles, accessories, settings, onBookSelect, onBundleSelect, onAccessorySelect, onAddToCart }: HomeProps) {
   const [activeCategory, setActiveCategory] = useState('الكل');
   const categories = ['الكل', ...new Set(books.map(b => b.category))];
 
@@ -92,18 +94,18 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
       {/* Bundles Section */}
       {bundles && bundles.length > 0 && (
         <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 bg-primary/5 rounded-[4rem] my-20">
-          <div className="flex flex-col md:flex-row-reverse items-center justify-between gap-6 mb-12">
+          <div className="flex flex-row items-center justify-between gap-6 mb-12">
+            <div className="flex gap-2">
+                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-zinc-400 border border-zinc-100 hover:text-primary transition-colors cursor-pointer">→</div>
+                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-zinc-400 border border-zinc-100 hover:text-primary transition-colors cursor-pointer">←</div>
+            </div>
             <div className="text-right">
               <div className="inline-flex items-center gap-2 px-4 py-1 bg-primary text-white rounded-full text-xs font-bold mb-4 flex-row-reverse">
                 <Ticket className="w-3 h-3" />
                 عروض حصرية
               </div>
-              <h2 className="text-4xl font-bold mb-3">باقات التوفير</h2>
+              <h2 className="text-4xl font-bold mb-3">قوائم التوفير</h2>
               <p className="text-zinc-500">اختر مجموعتك المفضلة ووفر أكثر مع عروضنا الخاصة.</p>
-            </div>
-            <div className="flex gap-2">
-                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary border border-zinc-100">→</div>
-                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary border border-zinc-100">←</div>
             </div>
           </div>
 
@@ -112,7 +114,8 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
               <motion.div 
                 key={bundle.id}
                 whileHover={{ y: -10 }}
-                className="bg-white rounded-[2.5rem] p-8 border border-zinc-100 shadow-xl shadow-primary/5 flex flex-col items-end text-right group relative overflow-hidden"
+                onClick={() => onBundleSelect(bundle)}
+                className="bg-white rounded-[2.5rem] p-8 border border-zinc-100 shadow-xl shadow-primary/5 flex flex-col items-end text-right group relative overflow-hidden cursor-pointer"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[4rem] -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-700" />
                 
@@ -176,7 +179,11 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
       {/* Accessories Section */}
       {accessories && accessories.length > 0 && (
         <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 bg-zinc-50/50">
-          <div className="flex flex-col md:flex-row-reverse items-center justify-between gap-6 mb-12">
+          <div className="flex flex-row items-center justify-between gap-6 mb-12">
+            <div className="flex gap-2">
+                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-zinc-400 border border-zinc-100 hover:text-primary transition-colors cursor-pointer">→</div>
+                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-zinc-400 border border-zinc-100 hover:text-primary transition-colors cursor-pointer">←</div>
+            </div>
             <div className="text-right">
               <div className="inline-flex items-center gap-2 px-4 py-1 bg-zinc-100 text-zinc-500 rounded-full text-xs font-bold mb-4 flex-row-reverse">
                 <Package className="w-3 h-3" />
@@ -195,7 +202,8 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.05 }}
                 key={accessory.id}
-                className="bg-white rounded-[2.5rem] p-6 border border-zinc-100 shadow-xl shadow-primary/5 group"
+                onClick={() => onAccessorySelect(accessory)}
+                className="bg-white rounded-[2.5rem] p-6 border border-zinc-100 shadow-xl shadow-primary/5 group cursor-pointer"
               >
                 <div className="relative aspect-square mb-6 overflow-hidden rounded-3xl bg-zinc-50">
                   <img 

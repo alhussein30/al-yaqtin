@@ -12,20 +12,22 @@ interface AdminBookFormProps {
 
 const BOOK_CATEGORIES = [
   'التاريخ',
-  'الخيال',
-  'الفنون والثقافة',
-  'الفلسفة',
+  'خيال',
+  'فنون',
+  'ثقافة',
+  'فلسفة',
   'روايات',
   'تطوير الذات',
   'علوم',
   'دين',
   'أطفال',
-  'أدب',
+  'آداب',
   'علم نفس',
   'تكنولوجيا',
   'اقتصاد',
   'سياسة',
-  'تاريخ الفن'
+  'تاريخ الفن',
+  'أخرى'
 ];
 
 export default function AdminBookForm({ isOpen, onClose, onSave, editBook }: AdminBookFormProps) {
@@ -211,16 +213,7 @@ export default function AdminBookForm({ isOpen, onClose, onSave, editBook }: Adm
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <label className="text-sm font-bold text-zinc-700">ISBN</label>
-                    <input 
-                      type="text" 
-                      value={formData.isbn}
-                      onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
-                      className="w-full bg-zinc-100 border-none rounded-2xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-right font-mono"
-                    />
-                  </div>
+                <div className="grid grid-cols-1 gap-6">
                   <div className="space-y-3">
                     <label className="text-sm font-bold text-zinc-700">نوع الغلاف</label>
                     <input 

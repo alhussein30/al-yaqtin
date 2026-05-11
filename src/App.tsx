@@ -12,7 +12,7 @@ import { useState, useCallback, MouseEvent, useRef, FormEvent, useEffect } from 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './components/Home';
-import BookDetails from './components/BookDetails';
+import ProductDetails from './components/ProductDetails';
 import AdminDashboard from './components/AdminDashboard';
 import CartDrawer from './components/CartDrawer';
 import AdminBookForm from './components/AdminBookForm';
@@ -36,7 +36,7 @@ import {
 export default function App() {
   // Navigation State
   const [currentView, setCurrentView] = useState<View>('home');
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Book | Bundle | Accessory | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState('');
@@ -219,8 +219,8 @@ export default function App() {
   const [accessoryToEdit, setAccessoryToEdit] = useState<Accessory | null>(null);
 
   // Handlers
-  const handleBookClick = useCallback((book: Book) => {
-    setSelectedBook(book);
+  const handleItemSelect = useCallback((item: Book | Bundle | Accessory) => {
+    setSelectedItem(item);
     setCurrentView('details');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
@@ -477,13 +477,15 @@ export default function App() {
                     bundles={bundles}
                     accessories={accessories}
                     settings={siteSettings}
-                    onBookSelect={handleBookClick} 
+                    onBookSelect={handleItemSelect} 
+                    onBundleSelect={handleItemSelect}
+                    onAccessorySelect={handleItemSelect}
                     onAddToCart={handleAddToCart} 
                   />
                 </motion.div>
               )}
 
-              {currentView === 'details' && selectedBook && (
+              {currentView === 'details' && selectedItem && (
                 <motion.div 
                   key="details"
                   initial={{ opacity: 0, x: 20 }}
@@ -491,10 +493,11 @@ export default function App() {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <BookDetails 
-                    book={selectedBook} 
+                  <ProductDetails 
+                    product={selectedItem} 
+                    allBooks={books}
                     onBack={() => setCurrentView('home')} 
-                    onAddToCart={(book) => handleAddToCart(book)}
+                    onAddToCart={(item) => handleAddToCart(item)}
                   />
                 </motion.div>
               )}

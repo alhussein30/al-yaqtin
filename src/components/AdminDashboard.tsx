@@ -97,36 +97,36 @@ export default function AdminDashboard({
           </div>
         </div>
         
-        <div className="flex gap-4 w-full md:w-auto">
+        <div className="flex flex-wrap md:flex-nowrap gap-4 w-full md:w-auto">
           <button 
             onClick={onAddAccessory}
-            className="flex-1 bg-white border-2 border-zinc-200 text-zinc-600 px-6 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-zinc-50 transition-all active:scale-95 shadow-sm"
+            className="flex-1 min-w-[140px] bg-white border-2 border-zinc-200 text-zinc-600 px-4 md:px-6 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 md:gap-3 hover:bg-zinc-50 transition-all active:scale-95 shadow-sm text-sm md:text-base"
           >
             <Package className="w-5 h-5" />
             إضافة إكسسوار
           </button>
           <button 
             onClick={onAddBundle}
-            className="flex-1 bg-white border-2 border-primary text-primary px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-primary/5 transition-all active:scale-95 shadow-sm"
+            className="flex-1 min-w-[140px] bg-white border-2 border-primary text-primary px-4 md:px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 md:gap-3 hover:bg-primary/5 transition-all active:scale-95 shadow-sm text-sm md:text-base"
           >
             <Ticket className="w-5 h-5" />
-            إضافة عرض جديد
+            إضافة عرض
           </button>
           <button 
             onClick={onAddBook}
-            className="flex-1 bg-primary text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl hover:bg-primary-light transition-all active:scale-95 shadow-primary/20"
+            className="flex-1 min-w-[140px] bg-primary text-white px-4 md:px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 md:gap-3 shadow-xl hover:bg-primary-light transition-all active:scale-95 shadow-primary/20 text-sm md:text-base"
           >
             <Plus className="w-5 h-5" />
-            إضافة كتاب جديد
+            إضافة كتاب
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-4 mb-8 flex-row-reverse">
+      <div className="flex gap-4 mb-8 flex-row-reverse overflow-x-auto whitespace-nowrap pb-4 scrollbar-hide snap-x">
         <button 
           onClick={() => setActiveTab('books')}
-          className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+          className={`flex-shrink-0 px-8 py-3 rounded-xl font-bold text-sm transition-all snap-start ${
             activeTab === 'books' 
               ? 'bg-primary text-white shadow-lg shadow-primary/20' 
               : 'bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-100'
@@ -136,7 +136,7 @@ export default function AdminDashboard({
         </button>
         <button 
           onClick={() => setActiveTab('bundles')}
-          className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+          className={`flex-shrink-0 px-8 py-3 rounded-xl font-bold text-sm transition-all snap-start ${
             activeTab === 'bundles' 
               ? 'bg-primary text-white shadow-lg shadow-primary/20' 
               : 'bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-100'
@@ -146,7 +146,7 @@ export default function AdminDashboard({
         </button>
         <button 
           onClick={() => { setActiveTab('accessories'); setFilterCategory('All'); }}
-          className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+          className={`flex-shrink-0 px-8 py-3 rounded-xl font-bold text-sm transition-all snap-start ${
             activeTab === 'accessories' 
               ? 'bg-primary text-white shadow-lg shadow-primary/20' 
               : 'bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-100'
@@ -156,7 +156,7 @@ export default function AdminDashboard({
         </button>
         <button 
           onClick={() => setActiveTab('shipping')}
-          className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+          className={`flex-shrink-0 px-8 py-3 rounded-xl font-bold text-sm transition-all snap-start ${
             activeTab === 'shipping' 
               ? 'bg-primary text-white shadow-lg shadow-primary/20' 
               : 'bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-100'
@@ -166,7 +166,7 @@ export default function AdminDashboard({
         </button>
         <button 
           onClick={() => setActiveTab('settings')}
-          className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+          className={`flex-shrink-0 px-8 py-3 rounded-xl font-bold text-sm transition-all snap-start ${
             activeTab === 'settings' 
               ? 'bg-primary text-white shadow-lg shadow-primary/20' 
               : 'bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-100'
@@ -432,18 +432,19 @@ export default function AdminDashboard({
             </div>
           </div>
         ) : (
-          <div className="overflow-x-auto scrollbar-hide text-right" dir="rtl">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-zinc-50 text-zinc-400 text-xs font-bold uppercase tracking-widest text-right">
-                  <th className="px-8 py-5">{activeTab === 'books' ? 'الكتاب' : activeTab === 'accessories' ? 'الإكسسوار' : 'العرض'}</th>
-                  <th className="px-8 py-5">{activeTab === 'books' ? 'الفئة' : activeTab === 'accessories' ? 'الفئة' : 'عدد الكتب'}</th>
-                  <th className="px-8 py-5">المخزن</th>
-                  <th className="px-8 py-5">السعر</th>
-                  <th className="px-8 py-5 text-center">الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-50">
+          <div className="overflow-x-auto text-right" dir="rtl">
+            <div className="min-w-[800px]">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-zinc-50 text-zinc-400 text-xs font-bold uppercase tracking-widest text-right">
+                    <th className="px-8 py-5">{activeTab === 'books' ? 'الكتاب' : activeTab === 'accessories' ? 'الإكسسوار' : 'العرض'}</th>
+                    <th className="px-8 py-5">{activeTab === 'books' ? 'الفئة' : activeTab === 'accessories' ? 'الفئة' : 'عدد الكتب'}</th>
+                    <th className="px-8 py-5">المخزن</th>
+                    <th className="px-8 py-5">السعر</th>
+                    <th className="px-8 py-5 text-center">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-50">
                 <AnimatePresence mode="popLayout">
                   {activeTab === 'books' ? (
                     filteredBooks.map((book) => (
@@ -684,9 +685,10 @@ export default function AdminDashboard({
               </div>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
+  </div>
   );
 }
 

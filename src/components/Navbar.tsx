@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Logo from './Logo';
@@ -14,12 +14,25 @@ interface NavbarProps {
 
 export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeClick, onBooksClick, currentView }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   const handleMobileNav = (callback: () => void) => {
     callback();
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogoMouseDown = () => {
+    pressTimer.current = setTimeout(() => {
+      onAdminClick();
+    }, 3000); // 3 seconds long press
+  };
+
+  const handleLogoMouseUp = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+    }
   };
 
   return (
@@ -29,7 +42,11 @@ export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeCli
         <div className="flex-1 flex justify-start">
           <div 
             onClick={onHomeClick}
-            className="flex items-center gap-3 cursor-pointer group"
+            onMouseDown={handleLogoMouseDown}
+            onMouseUp={handleLogoMouseUp}
+            onTouchStart={handleLogoMouseDown}
+            onTouchEnd={handleLogoMouseUp}
+            className="flex items-center gap-3 cursor-pointer group select-none"
           >
             <Logo size="md" className="rotate-[-8deg] group-hover:rotate-0 transition-all duration-500 shadow-lg" />
             <div>
@@ -52,12 +69,6 @@ export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeCli
             className="text-sm font-bold text-zinc-500 hover:text-primary transition-all"
           >
             الكتب
-          </button>
-          <button 
-            onClick={onAdminClick}
-            className={`text-sm font-bold transition-all hover:text-primary ${currentView === 'admin' ? 'text-primary underline decoration-2 underline-offset-8' : 'text-zinc-500'}`}
-          >
-            لوحة الإدارة
           </button>
         </div>
 
@@ -121,13 +132,6 @@ export default function Navbar({ onCartClick, cartCount, onAdminClick, onHomeCli
               >
                 الكتب
               </button>
-              <button 
-                onClick={() => handleMobileNav(onAdminClick)}
-                className={`text-right py-3 px-4 rounded-xl font-bold transition-all ${currentView === 'admin' ? 'bg-primary/5 text-primary' : 'text-zinc-600 hover:bg-zinc-50'}`}
-              >
-                لوحة الإدارة
-              </button>
-              
               <div className="relative mt-2">
                 <input 
                   type="text" 
