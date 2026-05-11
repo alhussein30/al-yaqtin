@@ -110,7 +110,6 @@ export default function App() {
       heroBookId: '',
       heroTag: 'إصدار متميز لعام 2023',
       heroTitle1: 'يمكنك أن تبحر بلا بحر',
-      heroTitle2: 'فقط ان أمسكت كتابا',
       heroSubtitle: 'اكتشف عالم القراءة مع مكتبة اليقطين، حيث تجد أرقى الكتب وأحدث الإصدارات في مكان واحد.',
       footerDescription: 'تأسست في عام 2023 لتكون وجهتكم الأولى للثقافة والمعرفة. نحن نؤمن بأن كل كتاب هو بداية لرحلة معرفية جديدة ومتميزة.',
       whatsappNumber: '201116135630',
@@ -188,9 +187,8 @@ export default function App() {
         const data = docSnap.data() as SiteSettings;
         setSiteSettings(data);
         localStorage.setItem('yaqten_settings_cache', JSON.stringify(data));
-      } else if (isLoggedIn) {
-        // Initialize default settings ONLY if logged in
-        const defaultSettings = {
+      } else {
+        const defaultSettings: SiteSettings = {
           heroBookId: '',
           heroTag: 'إصدار متميز لعام 2023',
           heroTitle1: 'يمكنك أن تبحر بلا بحر',
