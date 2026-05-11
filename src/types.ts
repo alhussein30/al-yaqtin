@@ -53,7 +53,7 @@ export interface Accessory {
   discountPercentage?: number;
 }
 
-export type View = 'home' | 'details' | 'admin' | 'wishlist';
+export type View = 'home' | 'details' | 'admin' | 'wishlist' | 'pomodoro';
 
 export interface ShippingRate {
   governorate: string;

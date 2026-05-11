@@ -11,6 +11,7 @@ interface NavbarProps {
   onAdminClick: () => void;
   onHomeClick: () => void;
   onBooksClick: () => void;
+  onPomodoroClick: () => void;
   currentView: string;
 }
 
@@ -22,6 +23,7 @@ export default function Navbar({
   onAdminClick, 
   onHomeClick, 
   onBooksClick, 
+  onPomodoroClick,
   currentView 
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -80,6 +82,12 @@ export default function Navbar({
             className="text-sm font-bold text-zinc-500 hover:text-primary transition-all"
           >
             الكتب
+          </button>
+          <button 
+            onClick={onPomodoroClick}
+            className={`text-sm font-bold transition-all hover:text-primary ${currentView === 'pomodoro' ? 'text-primary' : 'text-zinc-500'}`}
+          >
+            مؤقت القراءة
           </button>
         </div>
 
@@ -154,6 +162,12 @@ export default function Navbar({
                 className="text-right py-3 px-4 rounded-xl font-bold text-zinc-600 hover:bg-zinc-50"
               >
                 الكتب
+              </button>
+              <button 
+                onClick={() => handleMobileNav(onPomodoroClick)}
+                className={`text-right py-3 px-4 rounded-xl font-bold transition-all ${currentView === 'pomodoro' ? 'bg-primary/5 text-primary' : 'text-zinc-600 hover:bg-zinc-50'}`}
+              >
+                مؤقت القراءة
               </button>
             </div>
           </motion.div>

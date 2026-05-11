@@ -17,6 +17,7 @@ import Wishlist from './components/Wishlist';
 import AdminDashboard from './components/AdminDashboard';
 import CartDrawer from './components/CartDrawer';
 import AdminBookForm from './components/AdminBookForm';
+import PomodoroTimer from './components/PomodoroTimer';
 import AdminAccessoryForm from './components/AdminAccessoryForm';
 import { Book, Bundle, CartItem, View, ShippingRate, SiteSettings, Accessory } from './types';
 import { SAMPLE_BOOKS, EGYPT_GOVERNORATES } from './constants';
@@ -472,6 +473,7 @@ export default function App() {
           setCurrentView('home');
         }}
         onBooksClick={handleBooksScroll}
+        onPomodoroClick={() => setCurrentView('pomodoro')}
         currentView={currentView}
       />
 
@@ -514,6 +516,18 @@ export default function App() {
                     onAddToCart={handleAddToCart} 
                     onToggleWishlist={handleToggleWishlist}
                   />
+                </motion.div>
+              )}
+
+              {currentView === 'pomodoro' && (
+                <motion.div 
+                  key="pomodoro"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <PomodoroTimer />
                 </motion.div>
               )}
 
