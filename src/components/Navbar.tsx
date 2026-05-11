@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Search, ShoppingCart, User, Menu, X, Heart } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Logo from './Logo';
 
@@ -85,15 +85,6 @@ export default function Navbar({
 
         {/* Search Bar & Actions */}
         <div className="flex-1 flex items-center gap-4 md:gap-8 justify-end">
-          <div className="relative hidden sm:block w-48 lg:w-72">
-            <input 
-              type="text" 
-              placeholder="البحث عن كتاب..." 
-              className="w-full bg-zinc-100 border-none rounded-2xl py-3 pr-12 pl-6 text-sm outline-none focus:ring-2 focus:ring-primary/10 transition-all font-medium"
-            />
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
-          </div>
-
           <div className="flex items-center gap-4">
             <button 
               onClick={onWishlistClick}
@@ -164,14 +155,6 @@ export default function Navbar({
               >
                 الكتب
               </button>
-              <div className="relative mt-2">
-                <input 
-                  type="text" 
-                  placeholder="البحث عن كتاب..." 
-                  className="w-full bg-zinc-100 border-none rounded-2xl py-4 pr-12 pl-6 text-sm outline-none focus:ring-2 focus:ring-primary/10 transition-all font-medium"
-                />
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
-              </div>
             </div>
           </motion.div>
         )}

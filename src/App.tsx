@@ -37,6 +37,7 @@ import {
 export default function App() {
   // Navigation State
   const [currentView, setCurrentView] = useState<View>('home');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState<Book | Bundle | Accessory | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
@@ -466,7 +467,10 @@ export default function App() {
         cartCount={cartItems.reduce((s, i) => s + i.quantity, 0)}
         wishlistCount={wishlist.length}
         onAdminClick={() => setCurrentView('admin')}
-        onHomeClick={() => setCurrentView('home')}
+        onHomeClick={() => {
+          setSearchQuery('');
+          setCurrentView('home');
+        }}
         onBooksClick={handleBooksScroll}
         currentView={currentView}
       />
@@ -501,6 +505,8 @@ export default function App() {
                     bundles={bundles}
                     accessories={accessories}
                     settings={siteSettings}
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
                     onBookSelect={handleItemSelect} 
                     onBundleSelect={handleItemSelect}
                     onAccessorySelect={handleItemSelect}

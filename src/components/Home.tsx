@@ -3,26 +3,56 @@ import { motion } from 'motion/react';
 import { Book, Bundle, SiteSettings, Accessory } from '../types';
 import BookCard from './BookCard';
 import { MouseEvent } from 'react';
-import { Ticket, ShoppingCart, Package } from 'lucide-react';
+import { Ticket, ShoppingCart, Package, Search } from 'lucide-react';
 
 interface HomeProps {
   books: Book[];
   bundles: Bundle[];
   accessories: Accessory[];
   settings: SiteSettings;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
   onBookSelect: (book: Book) => void;
   onBundleSelect: (bundle: Bundle) => void;
   onAccessorySelect: (accessory: Accessory) => void;
   onAddToCart: (item: Book | Bundle | Accessory, e: MouseEvent) => void;
 }
 
-export default function Home({ books, bundles, accessories, settings, onBookSelect, onBundleSelect, onAccessorySelect, onAddToCart }: HomeProps) {
+export default function Home({ 
+  books, 
+  bundles, 
+  accessories, 
+  settings, 
+  searchQuery = '',
+  onSearchChange,
+  onBookSelect, 
+  onBundleSelect, 
+  onAccessorySelect, 
+  onAddToCart 
+}: HomeProps) {
   const [activeCategory, setActiveCategory] = useState('الكل');
   const categories = ['الكل', ...new Set(books.map(b => b.category))];
 
-  const filteredBooks = activeCategory === 'الكل' 
-    ? books 
-    : books.filter(b => b.category === activeCategory);
+  const filteredBooks = books.filter(b => {
+    const matchesCategory = activeCategory === 'الكل' || b.category === activeCategory;
+    const matchesSearch = !searchQuery || 
+      b.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      b.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  const filteredBundles = bundles.filter(b => 
+    !searchQuery || 
+    b.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    b.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredAccessories = accessories.filter(a => 
+    !searchQuery || 
+    a.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    a.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const featuredBook = settings.heroBookId 
     ? books.find(b => b.id === settings.heroBookId) || books[0]
@@ -94,7 +124,7 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
       </section>
       
       {/* Bundles Section */}
-      {bundles && bundles.length > 0 && (
+      {filteredBundles && filteredBundles.length > 0 && (
         <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 bg-primary/5 rounded-[4rem] my-20">
           <div className="flex flex-row items-center justify-between gap-6 mb-12">
             <div className="flex gap-2">
@@ -112,7 +142,7 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {bundles.map((bundle) => (
+            {filteredBundles.map((bundle) => (
               <motion.div 
                 key={bundle.id}
                 whileHover={{ y: -10 }}
@@ -179,7 +209,7 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
       )}
 
       {/* Accessories Section */}
-      {accessories && accessories.length > 0 && (
+      {filteredAccessories && filteredAccessories.length > 0 && (
         <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 bg-zinc-50/50">
           <div className="flex flex-row items-center justify-between gap-6 mb-12">
             <div className="flex gap-2">
@@ -197,7 +227,7 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {accessories.map((accessory, idx) => (
+            {filteredAccessories.map((accessory, idx) => (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -265,14 +295,28 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
 
       {/* Book Grid */}
       <section id="books-grid" className="max-w-7xl mx-auto px-6 md:px-12 py-20">
-        <div className="flex justify-between items-end mb-12">
-          <div className="text-right">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 mb-12">
+          <div className="text-right w-full md:w-auto">
             <h2 className="text-3xl font-bold mb-2">المجموعة المختارة</h2>
             <p className="text-zinc-400">كتب تم اختيارها بعناية من قبل قيّمينا.</p>
           </div>
-          <div className="flex gap-2">
-            <div className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-400 cursor-pointer hover:border-primary hover:text-primary transition-all">→</div>
-            <div className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-400 cursor-pointer hover:border-primary hover:text-primary transition-all">←</div>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto">
+            <div className="relative w-full sm:w-80">
+              <input 
+                type="text" 
+                placeholder="البحث عن كتاب او مؤلف..." 
+                value={searchQuery}
+                onChange={(e) => onSearchChange?.(e.target.value)}
+                className="w-full bg-zinc-100 border-none rounded-2xl py-4 pr-12 pl-6 text-sm outline-none focus:ring-2 focus:ring-primary/10 transition-all font-medium text-right"
+              />
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
+            </div>
+            
+            <div className="hidden md:flex gap-2">
+              <div className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-400 cursor-pointer hover:border-primary hover:text-primary transition-all">→</div>
+              <div className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-400 cursor-pointer hover:border-primary hover:text-primary transition-all">←</div>
+            </div>
           </div>
         </div>
 
