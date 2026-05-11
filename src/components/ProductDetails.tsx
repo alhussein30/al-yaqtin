@@ -183,7 +183,7 @@ export default function ProductDetails({ product, allBooks = [], isInWishlist, o
 
           <div className="py-10 border-y border-zinc-100 mb-10 text-right">
             <div className="flex items-baseline gap-6 mb-4 justify-end">
-              {(product.oldPrice || (product as any).discountPercentage) && (
+              {((product.oldPrice !== undefined && product.oldPrice > 0) || ((product as any).discountPercentage !== undefined && (product as any).discountPercentage > 0)) && (
                 <span className="text-xl text-zinc-400 line-through">{(product.oldPrice || product.price).toFixed(2)} ج.م</span>
               )}
               <span className="text-4xl font-bold text-primary">{discountedPrice.toFixed(2)} ج.م</span>

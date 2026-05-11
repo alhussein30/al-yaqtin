@@ -167,7 +167,7 @@ export default function Home({ books, bundles, accessories, settings, onBookSele
                     <div className="text-2xl font-black text-primary">
                         {bundle.price.toFixed(2)} ج.م
                     </div>
-                    {bundle.oldPrice && (
+                    {bundle.oldPrice !== undefined && bundle.oldPrice > 0 && (
                       <div className="text-xs text-zinc-400 line-through font-bold">{bundle.oldPrice.toFixed(2)} ج.م</div>
                     )}
                   </div>

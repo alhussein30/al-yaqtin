@@ -354,7 +354,7 @@ export default function App() {
         const newAccessory: Accessory = {
           ...accessoryData,
           id: accessoryRef.id,
-          rating: Number((Math.random() * 2 + 3).toFixed(1)),
+          rating: Number((Math.random() * 1 + 3.9).toFixed(1)),
           reviewsCount: Math.floor(Math.random() * 50),
         } as Accessory;
         await setDoc(accessoryRef, newAccessory);
@@ -379,7 +379,7 @@ export default function App() {
         const newBook: Book = {
           ...bookData,
           id: bookRef.id,
-          rating: Number((Math.random() * 2 + 3).toFixed(1)), // Mock rating for new books
+          rating: Number((Math.random() * 1 + 3.9).toFixed(1)), // Mock rating for new books
           reviewsCount: Math.floor(Math.random() * 100),
           publishDate: new Date().toLocaleDateString('ar-SA'),
         } as Book;

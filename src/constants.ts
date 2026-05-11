@@ -68,7 +68,7 @@ export const SAMPLE_BOOKS = [
     isbn: "978-2-34-567890-1",
     publishDate: "يناير 2021",
     coverType: "مجلد فاخر",
-    rating: 5,
+    rating: 4.9,
     reviewsCount: 540,
     stock: 12
   },

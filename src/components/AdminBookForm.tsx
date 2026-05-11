@@ -38,7 +38,7 @@ export default function AdminBookForm({ isOpen, onClose, onSave, editBook }: Adm
     price: 0,
     category: BOOK_CATEGORIES[0],
     coverImage: '',
-    rating: 5,
+    rating: 4.5,
     reviewsCount: 0,
     pages: 0,
     language: 'العربية',

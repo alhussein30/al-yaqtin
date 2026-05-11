@@ -648,7 +648,7 @@ export default function AdminDashboard({
                         <td className="px-8 py-5">
                           <div className="text-right">
                             <div className="font-bold text-primary">{bundle.price.toFixed(2)} ج.م</div>
-                            {bundle.oldPrice && (
+                            {bundle.oldPrice !== undefined && bundle.oldPrice > 0 && (
                               <div className="text-[10px] text-zinc-400 line-through">{bundle.oldPrice.toFixed(2)} ج.م</div>
                             )}
                           </div>

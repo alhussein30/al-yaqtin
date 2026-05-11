@@ -31,7 +31,7 @@ export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) 
         />
         
         {/* Discount Badge */}
-        {book.discountPercentage && book.discountPercentage > 0 && (
+        {book.discountPercentage !== undefined && book.discountPercentage > 0 && (
           <div className="absolute top-4 right-4 bg-red-600 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-lg z-10 flex items-center gap-1">
             <span>{book.discountPercentage}%</span>
             <span>خصم</span>
@@ -84,13 +84,13 @@ export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) 
            <div className="text-right">
              <div className="flex items-center gap-2 flex-row-reverse">
                <div className="text-lg font-bold text-primary">{discountedPrice.toFixed(2)} ج.م</div>
-               {book.discountPercentage && book.discountPercentage > 0 && (
+               {book.discountPercentage !== undefined && book.discountPercentage > 0 && (
                  <span className="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-lg border border-red-100">
                    -{book.discountPercentage}%
                  </span>
                )}
              </div>
-             {(book.oldPrice || (book.discountPercentage && book.discountPercentage > 0)) && (
+             {((book.oldPrice !== undefined && book.oldPrice > 0) || (book.discountPercentage !== undefined && book.discountPercentage > 0)) && (
                <div className="text-xs text-zinc-400 line-through">
                  {(book.oldPrice || book.price).toFixed(2)} ج.م
                </div>
