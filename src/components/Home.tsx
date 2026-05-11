@@ -11,11 +11,13 @@ interface HomeProps {
   accessories: Accessory[];
   settings: SiteSettings;
   searchQuery?: string;
+  wishlist: (Book | Bundle | Accessory)[];
   onSearchChange?: (query: string) => void;
   onBookSelect: (book: Book) => void;
   onBundleSelect: (bundle: Bundle) => void;
   onAccessorySelect: (accessory: Accessory) => void;
   onAddToCart: (item: Book | Bundle | Accessory, e: MouseEvent) => void;
+  onToggleWishlist: (item: Book | Bundle | Accessory) => void;
 }
 
 export default function Home({ 
@@ -24,11 +26,13 @@ export default function Home({
   accessories, 
   settings, 
   searchQuery = '',
+  wishlist,
   onSearchChange,
   onBookSelect, 
   onBundleSelect, 
   onAccessorySelect, 
-  onAddToCart 
+  onAddToCart,
+  onToggleWishlist
 }: HomeProps) {
   const [activeCategory, setActiveCategory] = useState('الكل');
   const categories = ['الكل', ...new Set(books.map(b => b.category))];
@@ -332,6 +336,11 @@ export default function Home({
                 book={book} 
                 onClick={() => onBookSelect(book)}
                 onAddToCart={(e) => onAddToCart(book, e)}
+                onToggleWishlist={(e) => {
+                  e.stopPropagation();
+                  onToggleWishlist(book);
+                }}
+                isInWishlist={wishlist.some(i => i.id === book.id)}
               />
             </motion.div>
           ))}

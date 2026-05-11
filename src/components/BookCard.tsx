@@ -1,4 +1,4 @@
-import { ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { MouseEvent } from 'react';
 import { Book } from '../types';
@@ -7,9 +7,11 @@ interface BookCardProps {
   book: Book;
   onClick: () => void;
   onAddToCart: (e: MouseEvent) => void;
+  onToggleWishlist?: (e: MouseEvent) => void;
+  isInWishlist?: boolean;
 }
 
-export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) {
+export default function BookCard({ book, onClick, onAddToCart, onToggleWishlist, isInWishlist }: BookCardProps) {
   const discountedPrice = book.discountPercentage 
     ? book.price * (1 - book.discountPercentage / 100) 
     : book.price;
@@ -30,6 +32,23 @@ export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) 
           className="w-full h-full object-cover rounded-lg shadow-xl group-hover:scale-105 transition-transform duration-500"
         />
         
+        {/* Wishlist Button */}
+        {onToggleWishlist && (
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleWishlist(e);
+            }}
+            className={`absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg z-20 ${
+              isInWishlist 
+                ? 'bg-primary text-white scale-110' 
+                : 'bg-white/80 backdrop-blur-md text-zinc-400 hover:text-primary lg:opacity-0 lg:group-hover:opacity-100'
+            }`}
+          >
+            <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+          </button>
+        )}
+
         {/* Discount Badge */}
         {book.discountPercentage !== undefined && book.discountPercentage > 0 && (
           <div className="absolute top-4 right-4 bg-red-600 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-lg z-10 flex items-center gap-1">
@@ -49,13 +68,13 @@ export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) 
         
         {/* Quick Actions overlay */}
         {!isOutOfStock && (
-          <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+          <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-white/90 to-transparent lg:from-transparent lg:to-transparent">
              <button 
               onClick={(e) => {
                 e.stopPropagation();
                 onAddToCart(e);
               }}
-              className="w-full bg-primary text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-primary-light active:scale-95 transition-all"
+              className="w-full bg-primary text-white py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-primary-light active:scale-95 transition-all text-sm sm:text-base"
              >
                <ShoppingCart className="w-4 h-4" />
                أضف للسلة

@@ -506,11 +506,13 @@ export default function App() {
                     accessories={accessories}
                     settings={siteSettings}
                     searchQuery={searchQuery}
+                    wishlist={wishlist}
                     onSearchChange={setSearchQuery}
                     onBookSelect={handleItemSelect} 
                     onBundleSelect={handleItemSelect}
                     onAccessorySelect={handleItemSelect}
                     onAddToCart={handleAddToCart} 
+                    onToggleWishlist={handleToggleWishlist}
                   />
                 </motion.div>
               )}
